@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    h1 {
+        @apply  text-lg
+    }
+    h3 {
+      @apply text-sm 
+    }
+    button[type='submit'], button[type='text'] {
+        @apply  py-3 px-3 w-48 border-none text-sm rounded text-slate-900 bg-lime-300 hover:-translate-y-0.5 transition-all;
+    }
+    input, select {
+      @apply block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm
+    }
+}
+
+@layer components {
+    .success {
+      @apply p-2 text-green-800 bg-green-100 rounded
+    }
+    .error {
+      @apply p-2 my-2 text-red-800 bg-red-100 rounded
+    }
+  }
