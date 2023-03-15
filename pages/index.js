@@ -67,7 +67,7 @@ export default function Home() {
                 {/* Secondary column (hidden on smaller screens) */}
                 <aside className="hidden overflow-y-auto transition-all duration-200 ease-in border-l border-gray-200 shadow w-96 hover:w-96 lg:block">
                   {/* <Aside /> */}
-                  {/* <Aside2 /> */}
+                  <Aside2 />
                   {/* <Aside3 /> */}
                 </aside>
               </div>

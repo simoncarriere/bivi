@@ -118,9 +118,9 @@ export default function Aside2() {
         {/* Inbox */}
         <ul role="list" className="px-6 mt-12 overflow-y-automb-6">
           {messages && messages.length > 0 ? (
-            <li key={message.id} className="py-2">
-              {messages.map((message) =>
-                message.sentAt ? (
+            messages.map((message) => (
+              <li key={message.id} className="py-2">
+                {message.sentAt ? (
                   <div className="flex space-x-2">
                     <div className="flex-shrink-0 pt-2">
                       <div className="w-6 h-6 rounded-full bg-slate-200" />
@@ -140,9 +140,9 @@ export default function Aside2() {
                   </div>
                 ) : (
                   <div className="w-full h-8 bg-white animate-pulse" />
-                )
-              )}
-            </li>
+                )}
+              </li>
+            ))
           ) : (
             <p className="pt-4 text-center text-gray-400">No messages yet</p>
           )}
