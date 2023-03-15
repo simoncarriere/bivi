@@ -5,20 +5,22 @@ import { collection, onSnapshot, query, where } from "firebase/firestore";
 /* 
   Expected Arguments:
   c - collection name
+  d - document id
+  s - subcollection name
   q - query array
 
   Expected usage:
   const { documents } = useCollection('rooms', ['members', 'array-contains', authUser.uid])
 */
 
-export const useCollection = (c, _q) => {
+export const useSubcollection = (c, d, s, _q) => {
   const [documents, setDocuments] = useState(null);
 
   // The reference won't trigger a useEffect inifinte loop
   const q = useRef(_q).current;
 
   useEffect(() => {
-    let ref = collection(db, c);
+    let ref = collection(db, c, d, s);
     if (q) {
       ref = query(ref, where(...q));
     }

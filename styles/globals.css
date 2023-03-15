@@ -3,25 +3,63 @@
 @tailwind utilities;
 
 @layer base {
-    h1 {
-        @apply  text-lg
-    }
-    h3 {
-      @apply text-sm 
-    }
-    button[type='submit'], button[type='text'] {
-        @apply  py-3 px-3 w-48 border-none text-sm rounded text-slate-900 bg-lime-300 hover:-translate-y-0.5 transition-all;
-    }
-    input, select {
-      @apply block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm
-    }
+  h1 {
+    @apply text-lg;
+  }
+  h3 {
+    @apply text-sm;
+  }
+  h4 {
+    @apply block text-sm font-medium text-gray-800;
+  }
+  p {
+    @apply text-sm  text-gray-400 leading-5;
+  }
+  button[type="submit"],
+  button[type="text"],
+  button[type="disabled"] {
+    @apply py-4 px-2  text-xs rounded border-none  hover:-translate-y-0.5 transition-all;
+  }
+  input,
+  select {
+    @apply block w-full appearance-none rounded-md border border-gray-100 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-lime-500 focus:outline-none focus:ring-lime-500 sm:text-sm;
+  }
+  label {
+    @apply block text-sm font-medium text-gray-800;
+  }
 }
 
 @layer components {
-    .success {
-      @apply p-2 text-green-800 bg-green-100 rounded
-    }
-    .error {
-      @apply p-2 my-2 text-red-800 bg-red-100 rounded
-    }
+  .card {
+    @apply flex flex-col gap-2 border border-gray-200 rounded p-4 m-4 bg-white;
   }
+  .success {
+    @apply p-2 my-2 text-green-800 bg-green-100 rounded;
+  }
+  .error {
+    @apply p-2 my-2 text-red-800 bg-red-100 rounded;
+  }
+  .btn-primary {
+    @apply w-full py-4 my-2 text-xs rounded text-slate-200 bg-slate-700 hover:bg-slate-800;
+  }
+  .btn-secondary {
+    @apply w-full py-3 my-2 text-xs rounded border bg-white hover:bg-slate-50 hover:-translate-y-0.5 transition-all;
+  }
+  .btn-disabled {
+    @apply w-full py-4 my-2 text-xs rounded border bg-gray-100 text-gray-400;
+  }
+  .btn-delete {
+    @apply py-2 px-3 text-xs rounded border text-red-500 border-red-200 bg-slate-50 hover:text-red-700 hover:bg-red-200;
+  }
+  .tag-primary {
+    @apply px-2 py-0.5 my-auto ml-2 text-xs text-blue-500 truncate bg-blue-200 rounded-lg;
+  }
+  .tag-secondary {
+    @apply px-2 py-0.5 my-auto ml-2 text-xs text-pink-500 truncate bg-pink-200 rounded-lg;
+  }
+}
+
+.zfix {
+  position: absolute;
+  z-index: 9999;
+}
