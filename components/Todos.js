@@ -22,6 +22,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
+// Filter Data
 const assignees = [{ displayName: "Unassigned", email: null, uid: 1 }];
 const labels = [
   { name: "Unlabelled", value: null },
@@ -45,11 +46,14 @@ const Todos = () => {
   // Filter todos by
   const [assigned, setAssigned] = useState(assignees[0]);
   //   const [labelled, setLabelled] = useState(labels[0]);
-  const [dated, setDated] = useState(dueDates[0]);
+  //   const [dated, setDated] = useState(dueDates[0]);
+  // Track todos
+  const [todos, setTodos] = useState([]);
+  const [filteredTodos, setFilteredTodos] = useState([]);
   // Create new todo
   const [todoTitle, setTodoTitle] = useState("");
   const [todoDescription, setTodoDescription] = useState("");
-  const [assignedTo, setAssignedTo] = useState(assignees[0]);
+  const [assignTo, setAssignTo] = useState(assignees[0]);
 
   // POPULATE ROOM MEMBERS
   useEffect(() => {
@@ -64,12 +68,42 @@ const Todos = () => {
     return () => unsub();
   }, [currentRoom, user.email]);
 
-  // Grab all the todos from the current room
-  const { documents: todos } = useSubcollection(
-    "rooms",
-    currentRoom.id,
-    "todos"
-  );
+  //   // Grab all the todos from the current room
+  //   const { documents: todos } = useSubcollection(
+  //     "rooms",
+  //     currentRoom.id,
+  //     "todos"
+  //   );
+
+  // Grab all todos from the current room
+  useEffect(() => {
+    let ref = collection(db, "rooms", currentRoom.id, "todos");
+
+    const unsub = onSnapshot(ref, (snapshot) => {
+      let results = [];
+      snapshot.docs.forEach((doc) => {
+        results.push({ ...doc.data(), id: doc.id });
+      });
+      setTodos(results);
+    });
+
+    return () => unsub();
+  }, [currentRoom]);
+
+  //   Filter todos by assignee
+  useEffect(() => {
+    if (assigned.uid !== 1) {
+      let filteredTodos = todos.filter(
+        (todo) => todo.assignTo === assigned.uid
+      );
+      //   console.log(assigned.uid);
+      //   console.log(todos);
+      //   console.log(filteredTodos);
+      setFilteredTodos(filteredTodos);
+    } else {
+      setFilteredTodos([]);
+    }
+  }, [assigned]);
 
   const addTodo = (e) => {
     e.preventDefault();
@@ -79,8 +113,8 @@ const Todos = () => {
       addDoc(roomTodoRef, {
         title: todoTitle,
         desc: todoDescription,
-        // assignedTo: assignedTo,
-        assignedTo: assignedTo.uid,
+        // assignTo: assignTo,
+        assignTo: assignTo.uid,
         createdAt: serverTimestamp(),
       }).then((docRef) => {
         console.log("Document written with ID: ", docRef.id);
@@ -91,11 +125,12 @@ const Todos = () => {
 
     setTodoTitle("");
     setTodoDescription("");
-    setAssignedTo(assignees[0]);
+    setAssignTo(assignees[0]);
   };
 
   return (
     <>
+      {/* Filters */}
       <div className="absolute">
         <div className="flex justify-end py-2 space-x-1 flex-nowrap ">
           {/* Filter Todos by assignee */}
@@ -250,7 +285,7 @@ const Todos = () => {
             )}
           </Listbox> */}
           {/* Filter by due date */}
-          <Listbox
+          {/* <Listbox
             as="div"
             value={dated}
             onChange={setDated}
@@ -314,21 +349,49 @@ const Todos = () => {
                 </div>
               </>
             )}
-          </Listbox>
+          </Listbox> */}
         </div>
       </div>
 
       {/* Todos */}
-      <div className="mt-16">
+      <div className="mt-16 ">
         {todos && todos.length > 0 ? (
-          todos.map((todo) => (
-            <div key={todo.id} className="">
-              <div>
-                <p>{todo.title}</p>
-                <p>{todo.desc}</p>
-              </div>
-            </div>
-          ))
+          <fieldset>
+            <legend className="sr-only">Todos</legend>
+            {filteredTodos.length > 0
+              ? filteredTodos.map((todo) => (
+                  <div
+                    key={todo.id}
+                    className="flex p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
+                  >
+                    <input
+                      aria-describedby="todo-description"
+                      type="checkbox"
+                      className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
+                    />
+                    <div className="ml-2">
+                      <h5>{todo.title}</h5>
+                      <p>{todo.desc}</p>
+                    </div>
+                  </div>
+                ))
+              : todos.map((todo) => (
+                  <div
+                    key={todo.id}
+                    className="flex p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
+                  >
+                    <input
+                      aria-describedby="todo-description"
+                      type="checkbox"
+                      className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
+                    />
+                    <div className="ml-2">
+                      <h5>{todo.title}</h5>
+                      <p>{todo.desc}</p>
+                    </div>
+                  </div>
+                ))}
+          </fieldset>
         ) : (
           <p className="mt-4 text-center text-gray-400">No tasks yet</p>
         )}
@@ -342,7 +405,7 @@ const Todos = () => {
         >
           <div className="overflow-hidden border border-gray-100 rounded-sm shadow-sm pb-14 focus-within:border-gray-200 focus-within:ring-1 focus-within:ring-gray-200">
             <label htmlFor="title" className="sr-only">
-              Todo Title
+              Task Title
             </label>
             <input
               type="text"
@@ -358,22 +421,21 @@ const Todos = () => {
               Description
             </label>
             <textarea
-              required
               rows={4}
               name="description"
               id="description"
               value={todoDescription}
               onChange={(e) => setTodoDescription(e.target.value)}
               className="block w-full py-0 text-gray-900 border-0 resize-none placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-              placeholder="Todo description..."
+              placeholder="Task description..."
               // defaultValue={""}
             />
             {/* Assign to */}
             <div className="absolute m-2">
               <Listbox
                 as="div"
-                value={assignedTo}
-                onChange={setAssignedTo}
+                value={assignTo}
+                onChange={setAssignTo}
                 className="flex-shrink-0"
               >
                 {({ open }) => (
@@ -385,7 +447,7 @@ const Todos = () => {
 
                     <div className="relative">
                       <Listbox.Button className="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 rounded-full whitespace-nowrap bg-gray-50 hover:bg-gray-100 sm:px-3">
-                        {assignedTo.email === null ? (
+                        {assignTo.email === null ? (
                           <UserCircleIcon
                             className="flex-shrink-0 w-5 h-5 text-gray-300 sm:-ml-1"
                             aria-hidden="true"
@@ -404,13 +466,13 @@ const Todos = () => {
 
                         <span
                           className={classNames(
-                            assignedTo.email === null ? "" : "text-gray-900",
+                            assignTo.email === null ? "" : "text-gray-900",
                             "hidden truncate sm:ml-2 sm:block"
                           )}
                         >
-                          {assignedTo.email === null
+                          {assignTo.email === null
                             ? "Assign to"
-                            : assignedTo.displayName}
+                            : assignTo.displayName}
                         </span>
                       </Listbox.Button>
 
