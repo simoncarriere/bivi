@@ -12,7 +12,9 @@ export default function LandingPage() {
       <div className="flex items-center gap-x-6 bg-gradient-to-r from-emerald-100 to-emerald-300 py-3 px-6 sm:px-3.5 justify-center mx-4 mt-2 rounded-md">
         <p className="text-sm leading-6 text-emerald-700">
           <a href="#">
-            <strong className="font-semibold">We're still building!</strong>
+            <strong className="font-semibold">
+              We&apos;re still building!
+            </strong>
             <svg
               viewBox="0 0 2 2"
               className="mx-2 inline h-0.5 w-0.5 fill-current"
@@ -20,7 +22,7 @@ export default function LandingPage() {
             >
               <circle cx={1} cy={1} r={1} />
             </svg>
-            But we're excited to show you what we've built so far.
+            But we&apos;re excited to show you what we&apos;ve built so far.
             <span aria-hidden="true" className="ml-2">
               &rarr;
             </span>

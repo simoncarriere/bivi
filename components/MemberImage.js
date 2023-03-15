@@ -1,9 +1,11 @@
+import Image from "next/image";
+
 const MemberImage = ({ member }) => {
   return (
     <span className="relative flex-shrink-0 inline-block">
       {member.imageUrl ? (
         <>
-          <img
+          <Image
             className="w-10 h-10 rounded-full"
             src={member.imageUrl}
             alt=""

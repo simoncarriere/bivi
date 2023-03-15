@@ -1,5 +1,6 @@
 import { Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
+import Image from "next/image";
 import {
   CalendarIcon,
   PaperClipIcon,
@@ -165,7 +166,7 @@ export default function Aside() {
                           >
                             <div className="flex items-center">
                               {assignee.avatar ? (
-                                <img
+                                <Image
                                   src={assignee.avatar}
                                   alt=""
                                   className="flex-shrink-0 w-5 h-5 rounded-full"

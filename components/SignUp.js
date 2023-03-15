@@ -63,7 +63,7 @@ const SignUp = () => {
                       className="flex flex-col gap-2 p-6"
                     >
                       <Dialog.Title as="h1" className="mb-4">
-                        Hey stranger! Let's get aquainted.
+                        Hey stranger! Let&apos;s get aquainted.
                       </Dialog.Title>
                       <input
                         type="email"
