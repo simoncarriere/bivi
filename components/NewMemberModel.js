@@ -3,8 +3,11 @@ import { Dialog, Transition, Menu } from "@headlessui/react";
 // Context
 import { useAuthContext } from "../hooks/useAuthContext";
 // Icons
-import { PlusIcon } from "@heroicons/react/24/outline";
-import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
+import { PlusIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
+import {
+  EllipsisVerticalIcon,
+  PaperAirplaneIcon,
+} from "@heroicons/react/20/solid";
 // Firebase
 import { db } from "../lib/firebase";
 import {
@@ -35,18 +38,13 @@ const NewMemberModal = () => {
   const [newMember, setNewMember] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [emailInvite, setEmailInvite] = useState("");
   // Members State
   const [members, setMembers] = useState([]);
   // Handle Modal
   const handleMembersModal = () => {
     setShowMembersModal(false);
   };
-
-  // let x = currentRoom.members.filter((member) => member !== newMember);
-  // if (currentRoom.members.includes(newMember)) {
-  //   setErrorMessage("User already in room");
-  // } else {
-  // }
 
   // POPULATE ROOM MEMBERS
   useEffect(() => {
@@ -67,17 +65,11 @@ const NewMemberModal = () => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
-
-    // console.log(newMemberData);
-
-    // console.log(querySnapshot.docs[0]);
-    // let addMember = querySnapshot.docs[0];
+    setEmailInvite("");
 
     // Step 1 - Check if user is already in room || is current user  -> (user.email !== newMember)
-
     // Step 2 - Check if the user has an account on the platform
     // Step 3 - If they do, add them to the room
-
     // Step 4 - If not, send them an invite
 
     // Check if email is current user -> Check if user exists on platform -> if not, send invite, refactor into only members list -> User already in room
@@ -111,15 +103,15 @@ const NewMemberModal = () => {
             membersId: arrayUnion(newMemberId),
           });
           setSuccessMessage(`User ${newMemberData.email} added to room`);
-          console.log("USER ADDED", newMemberData.email);
-          // console.log(currentMembers);
           setNewMember("");
         } catch (e) {
           console.error("Error adding document: ", e);
         }
       } else {
         // User doesn't have an account, send invite
-        setErrorMessage("User doesn't exist, send Invite");
+        setEmailInvite(
+          `mailto:${newMember}?subject=${user.email} invites you to join them at Bivi!&body=You have been invited to join the room ${currentRoom.name} on Bivi! Join them today https://bivi.io/ !`
+        );
       }
     } else {
       // Currently Logged in user -> TURN INTO USER IS ALREADY IN ROOM
@@ -198,13 +190,12 @@ const NewMemberModal = () => {
                       >
                         Manage Your Team
                       </Dialog.Title>
-                      {/* <div className="my-4">
-                          <p>
-                            Lorem ipsum, dolor sit amet consectetur adipisicing
-                            elit. Eius aliquam laudantium explicabo pariatur
-                            iste dolorem animi vitae error totam.
-                          </p>
-                        </div> */}
+                      <Dialog.Description>
+                        <p className="max-w-sm mx-auto mt-4 text-sm text-gray-400">
+                          Give your team access to this room and start
+                          collaborating in real time
+                        </p>
+                      </Dialog.Description>
                     </div>
 
                     {/* Add member to room */}
@@ -228,6 +219,23 @@ const NewMemberModal = () => {
                         />
                       </div>
                       {errorMessage && <p className="error">{errorMessage}</p>}
+                      {emailInvite && (
+                        <a
+                          className="w-full p-4 text-sm text-gray-800 border border-gray-200 rounded-sm hover:bg-gray-50"
+                          href={emailInvite}
+                        >
+                          <>
+                            {/* <h2 className="pb-1 mb-4 text-lg border-b border-gray-200">
+                              Uh-oh!
+                            </h2> */}
+                            <div className="flex">
+                              <PaperAirplaneIcon className="w-5 h-5 mr-2 text-gray-400" />
+                              {newMember} doesn't have an account at Bivi. Send
+                              them an invite!
+                            </div>
+                          </>
+                        </a>
+                      )}
                       {successMessage && (
                         <p className="success">{successMessage}</p>
                       )}
@@ -249,7 +257,7 @@ const NewMemberModal = () => {
                     {/* Your Team */}
                     {members && members.length > 0 && (
                       <div className="pt-6 mt-6 border-t border-gray-200">
-                        <h4>Your Team</h4>
+                        <h4>Members</h4>
                         <ul
                           role="list"
                           className="flex-1 divide-y divide-gray-200"
@@ -301,7 +309,6 @@ const NewMemberModal = () => {
                                     <Menu.Items className="absolute top-0 z-10 w-48 origin-top-right bg-white rounded-md shadow-lg right-9 ring-1 ring-black ring-opacity-5 focus:outline-none">
                                       <div className="py-1">
                                         <Menu.Item>
-                                          {/* {({ active }) => ( */}
                                           <div
                                             onClick={() =>
                                               deleteUser(person.uid)
@@ -310,38 +317,7 @@ const NewMemberModal = () => {
                                           >
                                             Remove from team
                                           </div>
-                                          {/* )} */}
                                         </Menu.Item>
-                                        {/* <Menu.Item>
-                                          {({ active }) => (
-                                            <a
-                                              href="#"
-                                              className={classNames(
-                                                active
-                                                  ? "bg-gray-100 text-gray-900"
-                                                  : "text-gray-700",
-                                                "block px-4 py-2 text-sm"
-                                              )}
-                                            >
-                                              View profile
-                                            </a>
-                                          )}
-                                        </Menu.Item>
-                                        <Menu.Item>
-                                          {({ active }) => (
-                                            <a
-                                              href="#"
-                                              className={classNames(
-                                                active
-                                                  ? "bg-gray-100 text-gray-900"
-                                                  : "text-gray-700",
-                                                "block px-4 py-2 text-sm"
-                                              )}
-                                            >
-                                              Send message
-                                            </a>
-                                          )}
-                                        </Menu.Item> */}
                                       </div>
                                     </Menu.Items>
                                   </Transition>
@@ -364,3 +340,9 @@ const NewMemberModal = () => {
 };
 
 export default NewMemberModal;
+
+// let x = currentRoom.members.filter((member) => member !== newMember);
+// if (currentRoom.members.includes(newMember)) {
+//   setErrorMessage("User already in room");
+// } else {
+// }

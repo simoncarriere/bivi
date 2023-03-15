@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 // Hooks
 import { useAuthContext } from "../hooks/useAuthContext";
+import { useDocument } from "../hooks/useDocument";
 // FIrebase
 import { db } from "../lib/firebase";
 import {
@@ -12,8 +13,8 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
+// Libraries
 import TimeAgo from "javascript-time-ago";
-
 import en from "javascript-time-ago/locale/en.json";
 TimeAgo.addDefaultLocale(en);
 import ReactTimeAgo from "react-time-ago";
@@ -23,17 +24,22 @@ function classNames(...classes) {
 }
 
 const tabs = [
-  { name: "Chat", href: "#", current: true },
-  { name: "Todos", href: "#", current: false },
-  { name: "Events", href: "#", current: false },
+  { name: "Todos", href: "#" },
+  { name: "Chat", href: "#" },
+  { name: "Events", href: "#" },
 ];
 
 export default function Aside2() {
   const { user, currentRoom } = useAuthContext();
+  // Mamage currentTab state
+  const [currentTab, setCurrentTab] = useState(tabs[0]);
   // Message Input State
   const [newMessage, setNewMessage] = useState("");
   // Local messages state
   const [messages, setMessages] = useState();
+
+  // Grab the current user's document (denormalized)
+  const { document: currentUser } = useDocument("users", user.uid);
 
   // Grab the messages from the current room
   useEffect(() => {
@@ -72,11 +78,18 @@ export default function Aside2() {
     setNewMessage("");
   };
 
+  const handleTabs = (tab) => {
+    setCurrentTab(tab);
+  };
+
+  console.log(currentTab);
+
   return (
     <div className="flex flex-col justify-between h-full max-h-screen pt-2 pb-5 bg-white">
       <div className="">
         {/* Tabs */}
         <div>
+          {/* Mobile tab list */}
           <div className=" sm:hidden">
             <label htmlFor="tabs" className="sr-only">
               Select a tab
@@ -86,31 +99,47 @@ export default function Aside2() {
               id="tabs"
               name="tabs"
               className="block w-full py-2 pl-3 pr-10 text-base border-gray-300 rounded-md focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
-              defaultValue={tabs.find((tab) => tab.current).name}
+              // defaultValue={tabs.find((tab) => tab.current).name}
+              onChange={(e) => {
+                console.log(e.target.value);
+              }}
             >
               {tabs.map((tab) => (
-                <option key={tab.name}>{tab.name}</option>
+                <option key={tab.name} value={tab.name}>
+                  {tab.name}
+                </option>
               ))}
             </select>
           </div>
+          {/* Desktop tab list */}
           <div className="fixed top-0 hidden w-full pt-4 bg-white shadow sm:block">
             <div className="">
               <nav className="flex px-6 space-x-6" aria-label="Tabs">
-                {tabs.map((tab) => (
-                  <a
-                    key={tab.name}
-                    href={tab.href}
-                    className={classNames(
-                      tab.current
-                        ? "border-slate-500 text-slate-700 font-semibold"
-                        : "border-transparent text-slate-400 hover:border-gray-300 hover:text-gray-700",
-                      "whitespace-nowrap border-b-2 py-2  text-xs font-medium"
-                    )}
-                    aria-current={tab.current ? "page" : undefined}
-                  >
-                    {tab.name}
-                  </a>
-                ))}
+                {tabs.map((tab) =>
+                  currentTab === tab ? (
+                    <a
+                      key={tab.name}
+                      href={tab.href}
+                      value={tab.name}
+                      className="py-2 text-xs font-semibold border-b-2 border-slate-500 text-slate-700 whitespace-nowrap"
+                      aria-current={tab.current ? "page" : undefined}
+                      onClick={() => handleTabs(tab)}
+                    >
+                      {tab.name}
+                    </a>
+                  ) : (
+                    <a
+                      key={tab.name}
+                      href={tab.href}
+                      value={tab.name}
+                      className="py-2 text-xs font-medium border-b-2 border-transparent text-slate-400 hover:border-gray-300 hover:text-gray-700 whitespace-nowrap"
+                      aria-current={tab.current ? "page" : undefined}
+                      onClick={() => handleTabs(tab)}
+                    >
+                      {tab.name}
+                    </a>
+                  )
+                )}
               </nav>
             </div>
           </div>
@@ -127,7 +156,7 @@ export default function Aside2() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="p-1 text-xs text-gray-400 truncate rounded-md ">
-                        Simon - {``}
+                        {currentUser.displayName} - {``}
                         <ReactTimeAgo
                           date={message.sentAt.toDate()}
                           locale="en-US"
@@ -163,14 +192,14 @@ export default function Aside2() {
             onChange={(e) => setNewMessage(e.target.value)}
             required
             type="text"
-            className="block px-5 py-3 text-gray-900 border-0 rounded-md shadow-sm pr-14 ring-1 ring-inset ring-gray-200 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-slate-300 sm:text-sm sm:leading-6"
+            className="block px-5 py-3 text-gray-900 bg-gray-100 border-0 rounded-md shadow-sm pr-14 ring-0 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-gray-200 sm:text-sm sm:leading-6"
 
             // className="flex-auto min-w-0 px-5 py-4 border-gray-100 rounded-md shadow-sm w-96 focus:ring-orange-500 outline-orange-500 sm:text-sm sm:leading-6"
           />
 
           <button
             type="submit"
-            className="absolute flex items-center px-4 m-2 text-xs font-medium text-gray-600 rounded-md inset-y-4 top-2 bg-slate-100 right-4 "
+            className="absolute flex items-center px-4 m-2 text-xs font-medium text-gray-600 bg-white rounded-md inset-y-4 top-2 right-4 "
           >
             Send
           </button>
