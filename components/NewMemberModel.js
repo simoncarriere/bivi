@@ -230,8 +230,8 @@ const NewMemberModal = () => {
                             </h2> */}
                             <div className="flex">
                               <PaperAirplaneIcon className="w-5 h-5 mr-2 text-gray-400" />
-                              {newMember} doesn't have an account at Bivi. Send
-                              them an invite!
+                              {newMember} doesn&apos;t have an account at Bivi.
+                              Send them an invite!
                             </div>
                           </>
                         </a>
