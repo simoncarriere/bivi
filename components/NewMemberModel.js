@@ -110,7 +110,8 @@ const NewMemberModal = () => {
       } else {
         // User doesn't have an account, send invite
         setEmailInvite(
-          `mailto:${newMember}?subject=${user.email} invites you to join them at Bivi!&body=You have been invited to join the room ${currentRoom.name} on Bivi! Join them today https://bivi.io/ !`
+          // `mailto:${newMember}?subject=${user.email} invites you to join them at Bivi!&body=You have been invited to join the room ${currentRoom.name} on Bivi! Join them today https://bivi.io/ !`
+          `mailto:${newMember}?subject= Hey! join me in Bivi!&body=You have been invited to join the room ${currentRoom.name} on Bivi! Sign up here https://bivi.io/ !`
         );
       }
     } else {
@@ -276,7 +277,7 @@ const NewMemberModal = () => {
                                       <p className="text-sm font-medium text-gray-900 truncate">
                                         {person.displayName}
                                       </p>
-                                      <p className="mt-1 text-xs text-gray-400 truncate">
+                                      <p className="text-xs text-gray-400 truncate ">
                                         {person.email}
                                       </p>
                                     </div>

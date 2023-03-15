@@ -29,24 +29,6 @@ const Chat = () => {
   // Grab the current user's document (denormalized)
   const { document: currentUser } = useDocument("users", user.uid);
 
-  const addMessage = (e) => {
-    e.preventDefault();
-
-    const roomInboxRef = collection(db, "rooms", currentRoom.id, "messages");
-    try {
-      addDoc(roomInboxRef, {
-        message: newMessage,
-        sender: user.uid,
-        sentAt: serverTimestamp(),
-      }).then((docRef) => {
-        console.log("Document written with ID: ", docRef.id);
-      });
-    } catch (e) {
-      console.error("Error adding document: ", e);
-    }
-    setNewMessage("");
-  };
-
   // Grab the messages from the current room
   useEffect(() => {
     let ref = query(
@@ -66,9 +48,27 @@ const Chat = () => {
     return () => unsub();
   }, [currentRoom]);
 
+  const addMessage = (e) => {
+    e.preventDefault();
+
+    const roomInboxRef = collection(db, "rooms", currentRoom.id, "messages");
+    try {
+      addDoc(roomInboxRef, {
+        message: newMessage,
+        sender: user.uid,
+        sentAt: serverTimestamp(),
+      }).then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+      });
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+    setNewMessage("");
+  };
+
   return (
     <>
-      <ul role="list" className="px-6 mt-12 overflow-y-automb-6">
+      <ul role="list">
         {messages && messages.length > 0 ? (
           messages.map((message) => (
             <li key={message.id} className="py-2">
@@ -99,7 +99,7 @@ const Chat = () => {
           <p className="pt-4 text-center text-gray-400">No messages yet</p>
         )}
       </ul>
-      <div className="fixed bottom-0 pb-4 bg-white w-96">
+      <div className="fixed bottom-0 pb-4 bg-white -right-1 w-96">
         <form
           onSubmit={addMessage}
           className="flex items-center px-4 mx-auto mt-2 "
