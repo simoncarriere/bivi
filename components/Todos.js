@@ -17,6 +17,8 @@ import { useAuthContext } from "../hooks/useAuthContext";
 import { db } from "../lib/firebase";
 import {
   collection,
+  doc,
+  updateDoc,
   onSnapshot,
   addDoc,
   serverTimestamp,
@@ -68,13 +70,6 @@ const Todos = () => {
     return () => unsub();
   }, [currentRoom, user.email]);
 
-  //   // Grab all the todos from the current room
-  //   const { documents: todos } = useSubcollection(
-  //     "rooms",
-  //     currentRoom.id,
-  //     "todos"
-  //   );
-
   // Grab all todos from the current room
   useEffect(() => {
     let ref = collection(db, "rooms", currentRoom.id, "todos");
@@ -90,15 +85,13 @@ const Todos = () => {
     return () => unsub();
   }, [currentRoom]);
 
-  //   Filter todos by assignee
+  // Filter todos by assignee
   useEffect(() => {
     if (assigned.uid !== 1) {
       let filteredTodos = todos.filter(
         (todo) => todo.assignTo === assigned.uid
       );
-      //   console.log(assigned.uid);
-      //   console.log(todos);
-      //   console.log(filteredTodos);
+
       setFilteredTodos(filteredTodos);
     } else {
       setFilteredTodos([]);
@@ -115,6 +108,7 @@ const Todos = () => {
         desc: todoDescription,
         // assignTo: assignTo,
         assignTo: assignTo.uid,
+        done: false,
         createdAt: serverTimestamp(),
       }).then((docRef) => {
         console.log("Document written with ID: ", docRef.id);
@@ -126,6 +120,17 @@ const Todos = () => {
     setTodoTitle("");
     setTodoDescription("");
     setAssignTo(assignees[0]);
+  };
+
+  const markTodoDone = (todo) => {
+    let isChecked = todo.done;
+    console.log(isChecked);
+    try {
+      const todoDocRef = doc(db, "rooms", currentRoom.id, "todos", todo.id);
+      updateDoc(todoDocRef, { done: !isChecked });
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
   };
 
   return (
@@ -367,11 +372,14 @@ const Todos = () => {
                     <input
                       aria-describedby="todo-description"
                       type="checkbox"
+                      checked={todo.done}
+                      onChange={() => markTodoDone(todo)}
                       className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
                     />
                     <div className="ml-2">
                       <h5>{todo.title}</h5>
                       <p>{todo.desc}</p>
+                      <p>{todo.assignTo}</p>
                     </div>
                   </div>
                 ))
@@ -383,11 +391,14 @@ const Todos = () => {
                     <input
                       aria-describedby="todo-description"
                       type="checkbox"
+                      checked={todo.done}
+                      onChange={() => markTodoDone(todo)}
                       className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
                     />
                     <div className="ml-2">
                       <h5>{todo.title}</h5>
                       <p>{todo.desc}</p>
+                      <p>{todo.assignTo}</p>
                     </div>
                   </div>
                 ))}
