@@ -91,12 +91,11 @@ const Todos = () => {
       let filteredTodos = todos.filter(
         (todo) => todo.assignTo === assigned.uid
       );
-
       setFilteredTodos(filteredTodos);
     } else {
       setFilteredTodos([]);
     }
-  }, [assigned]);
+  }, [assigned, todos]);
 
   const addTodo = (e) => {
     e.preventDefault();
