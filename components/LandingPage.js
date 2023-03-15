@@ -35,13 +35,13 @@ export default function LandingPage() {
           <Signin />
         </header>
 
-        <div className="flex flex-col max-w-xl gap-6 mx-auto mt-20">
+        <div className="flex flex-col max-w-xl gap-6 mx-auto mt-20 rounded-lg">
           <Image
             width={64}
             height={64}
             src="/logo.png"
             alt="logo"
-            className="mx-auto transition-all duration-300 rounded-lg hover:scale-110 "
+            className="object-contain mx-auto transition-all duration-300 rounded-lg hover:scale-110 "
           />
           <div>
             <h1 className="mb-6 text-2xl font-bold text-center text-gray-800 sm:text-7xl">
@@ -59,10 +59,10 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto mt-16 mb-24 transition-all duration-300 cursor-pointer hover:scale-105">
           <Image
             width={1440}
-            height={500}
+            height={986}
             src="/Amie.jpeg"
             alt="hero"
-            className="rounded-2xl"
+            className="object-contain rounded-2xl"
           />
         </div>
         <Footer />
