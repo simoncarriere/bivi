@@ -17,7 +17,7 @@ export default function UserDropdown({ user }) {
         <Menu.Button>
           <span className="relative inline-block mx-auto transition-all ease-in-out cursor-pointer hover:scale-110 duration-400 ">
             <svg
-              className="w-12 h-12 text-gray-300 border border-gray-200 rounded-full"
+              className="w-12 h-12 text-gray-300 border border-gray-100 rounded-full"
               fill="currentColor"
               viewBox="0 0 24 24"
             >

@@ -55,6 +55,7 @@ const Chat = () => {
     try {
       addDoc(roomInboxRef, {
         message: newMessage,
+        sentBy: currentUser.displayName,
         sender: user.uid,
         sentAt: serverTimestamp(),
       }).then((docRef) => {
@@ -79,7 +80,7 @@ const Chat = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="p-1 text-xs text-gray-400 truncate rounded-md ">
-                      {currentUser.displayName} - {``}
+                      {currentUser.sender} - {``}
                       <ReactTimeAgo
                         date={message.sentAt.toDate()}
                         locale="en-US"

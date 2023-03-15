@@ -425,7 +425,7 @@ const Todos = () => {
               value={todoTitle}
               onChange={(e) => setTodoTitle(e.target.value)}
               className="block w-full border-0 pt-2.5 text-lg font-medium placeholder:text-gray-400 focus:ring-0"
-              placeholder="Todo Title"
+              placeholder="Task Title"
             />
             <label htmlFor="description" className="sr-only">
               Description
