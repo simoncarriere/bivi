@@ -42,7 +42,7 @@ const Onboard = () => {
     if (rooms !== null && rooms.length > 0) {
       dispatch({ type: "SET_CURRENT_ROOM", payload: rooms[0] });
     }
-  }, [rooms]);
+  }, [rooms, dispatch]);
 
   const submitRoom = (e) => {
     e.preventDefault();
@@ -118,7 +118,7 @@ const Onboard = () => {
                     </Dialog.Title>
 
                     <p className="px-4 pb-4">
-                      You'll be able to invite your mates in a bit!
+                      You&apos;ll be able to invite your mates in a bit!
                     </p>
                     {/* <h1>Step 1 - Create your room</h1> */}
                     <div className="flex flex-col gap-2">

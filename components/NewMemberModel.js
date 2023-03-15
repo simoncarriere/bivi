@@ -61,7 +61,7 @@ const NewMemberModal = () => {
       setMembers(results);
     });
     return () => unsub();
-  }, [currentRoom]);
+  }, [currentRoom, user.email]);
 
   const submitMember = async (e) => {
     e.preventDefault();

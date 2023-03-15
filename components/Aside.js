@@ -128,7 +128,7 @@ export default function Aside() {
                           aria-hidden="true"
                         />
                       ) : (
-                        <img
+                        <Image
                           src={assigned.avatar}
                           alt=""
                           className="flex-shrink-0 w-5 h-5 rounded-full"

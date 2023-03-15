@@ -32,7 +32,7 @@ const Sidebar = () => {
       setMembers(results);
     });
     return () => unsub();
-  }, [currentRoom]);
+  }, [currentRoom, user.email]);
 
   return (
     <>
