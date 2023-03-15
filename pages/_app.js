@@ -1,13 +1,14 @@
 import "../styles/globals.css";
-import { Inter } from "@next/font/google";
+// import { Inter } from "@next/font/google";
 import { AuthContextProvider } from "../context/AuthContext";
 
-const inter = Inter({ subsets: ["latin"] });
+// const inter = Inter({ subsets: ["latin"] });
 
 function MyApp({ Component, pageProps }) {
   return (
     <AuthContextProvider>
-      <div className={inter.className}>
+      <div>
+        {/* className={inter.className} */}
         <Component {...pageProps} />
       </div>
     </AuthContextProvider>
