@@ -43,6 +43,7 @@ const RoomModal = () => {
     "array-contains",
     user.uid,
   ]);
+  console.log(rooms);
   // Grab the current user's document (denormalized)
   const { document: currentUser } = useDocument("users", user.uid);
 

@@ -72,7 +72,7 @@ const Chat = () => {
       <ul role="list">
         {messages && messages.length > 0 ? (
           messages.map((message) => (
-            <li key={message.id} className="py-2">
+            <li key={message.id} className="py-1">
               {message.sentAt ? (
                 <div className="flex space-x-2">
                   <div className="flex-shrink-0 pt-2">

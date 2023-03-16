@@ -358,7 +358,7 @@ const Todos = () => {
       </div>
 
       {/* Todos */}
-      <div className="mt-16 ">
+      <div className="mt-14 ">
         {todos && todos.length > 0 ? (
           <fieldset>
             <legend className="sr-only">Todos</legend>
