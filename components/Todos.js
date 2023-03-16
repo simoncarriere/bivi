@@ -7,6 +7,7 @@ import {
   ChevronUpDownIcon,
   CalendarIcon,
   PaperClipIcon,
+  InboxStackIcon,
   TagIcon,
   UserCircleIcon,
 } from "@heroicons/react/20/solid";
@@ -27,8 +28,11 @@ import {
 // Filter Data
 const assignees = [{ displayName: "Unassigned", email: null, uid: 1 }];
 const labels = [
-  { name: "Unlabelled", value: null },
-  { name: "Engineering", value: "engineering" },
+  { name: "All", value: null },
+  { name: "Active", value: false },
+  { name: "Completed", value: true },
+  // { name: "Unlabelled", value: null },
+  // { name: "Engineering", value: "engineering" },
   // More items...
 ];
 const dueDates = [
@@ -47,7 +51,7 @@ const Todos = () => {
   const [members, setMembers] = useState([]);
   // Filter todos by
   const [assigned, setAssigned] = useState(assignees[0]);
-  //   const [labelled, setLabelled] = useState(labels[0]);
+  const [labelled, setLabelled] = useState(labels[0]);
   //   const [dated, setDated] = useState(dueDates[0]);
   // Track todos
   const [todos, setTodos] = useState([]);
@@ -56,6 +60,7 @@ const Todos = () => {
   const [todoTitle, setTodoTitle] = useState("");
   const [todoDescription, setTodoDescription] = useState("");
   const [assignTo, setAssignTo] = useState(assignees[0]);
+  const [noFilteredTodos, setNoFilteredTodos] = useState(false);
 
   // POPULATE ROOM MEMBERS
   useEffect(() => {
@@ -87,15 +92,64 @@ const Todos = () => {
 
   // Filter todos by assignee
   useEffect(() => {
-    if (assigned.uid !== 1) {
-      let filteredTodos = todos.filter(
-        (todo) => todo.assignTo === assigned.uid
-      );
-      setFilteredTodos(filteredTodos);
+    setNoFilteredTodos(false);
+    if (labelled.value !== null || assigned.uid !== 1) {
+      // Both Filters in use
+      if (labelled.value !== null && assigned.uid !== 1) {
+        let filteredTodos = todos.filter(
+          (todo) =>
+            todo.done === labelled.value && todo.assignTo === assigned.uid
+        );
+        if (filteredTodos.length > 0) {
+          console.log(filteredTodos.length);
+          setFilteredTodos(filteredTodos);
+          return;
+        } else {
+          console.log(filteredTodos.length);
+          setNoFilteredTodos(true);
+          setFilteredTodos([]);
+          console.log("no todos");
+          return;
+        }
+      }
+      // Only Labelled Filter in use
+      else if (labelled.value !== null && assigned.uid === 1) {
+        let filteredTodos = todos.filter(
+          (todo) => todo.done === labelled.value
+        );
+        if (filteredTodos.length > 0) {
+          console.log(filteredTodos.length);
+          setFilteredTodos(filteredTodos);
+          return;
+        } else {
+          console.log(filteredTodos.length);
+          setNoFilteredTodos(true);
+          setFilteredTodos([]);
+          console.log("no todos");
+          return;
+        }
+      }
+      // Only Assigned Filter in use
+      else if (labelled.value === null && assigned.uid !== 1) {
+        let filteredTodos = todos.filter(
+          (todo) => todo.assignTo === assigned.uid
+        );
+        if (filteredTodos.length > 0) {
+          console.log(filteredTodos.length);
+          setFilteredTodos(filteredTodos);
+          return;
+        } else {
+          console.log(filteredTodos.length);
+          setNoFilteredTodos(true);
+          setFilteredTodos([]);
+          console.log("no todos");
+          return;
+        }
+      }
     } else {
       setFilteredTodos([]);
     }
-  }, [assigned, todos]);
+  }, [assigned, todos, labelled]);
 
   const addTodo = (e) => {
     e.preventDefault();
@@ -123,7 +177,6 @@ const Todos = () => {
 
   const markTodoDone = (todo) => {
     let isChecked = todo.done;
-    console.log(isChecked);
     try {
       const todoDocRef = doc(db, "rooms", currentRoom.id, "todos", todo.id);
       updateDoc(todoDocRef, { done: !isChecked });
@@ -193,7 +246,7 @@ const Todos = () => {
                           className={({ active }) =>
                             classNames(
                               active ? "bg-gray-100" : "bg-white",
-                              "relative cursor-default select-none py-2 px-3"
+                              "relative  select-none py-2 px-3 cursor-pointer"
                             )
                           }
                           value={assignee}
@@ -225,8 +278,8 @@ const Todos = () => {
               </>
             )}
           </Listbox>
-          {/* Filter by Tag */}
-          {/* <Listbox
+          {/* Filter by completed */}
+          <Listbox
             as="div"
             value={labelled}
             onChange={setLabelled}
@@ -237,7 +290,7 @@ const Todos = () => {
                 <Listbox.Label className="sr-only"> Add a label </Listbox.Label>
                 <div className="relative">
                   <Listbox.Button className="relative inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 rounded-full whitespace-nowrap bg-gray-50 hover:bg-gray-100 sm:px-3">
-                    <TagIcon
+                    <InboxStackIcon
                       className={classNames(
                         labelled.value === null
                           ? "text-gray-300"
@@ -252,7 +305,7 @@ const Todos = () => {
                         "hidden truncate sm:ml-2 sm:block"
                       )}
                     >
-                      {labelled.value === null ? "Labelled" : labelled.name}
+                      {labelled.value === null ? "Status" : labelled.name}
                     </span>
                   </Listbox.Button>
 
@@ -287,7 +340,7 @@ const Todos = () => {
                 </div>
               </>
             )}
-          </Listbox> */}
+          </Listbox>
           {/* Filter by due date */}
           {/* <Listbox
             as="div"
@@ -362,45 +415,53 @@ const Todos = () => {
         {todos && todos.length > 0 ? (
           <fieldset>
             <legend className="sr-only">Todos</legend>
-            {filteredTodos.length > 0
-              ? filteredTodos.map((todo) => (
-                  <div
-                    key={todo.id}
-                    className="flex p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
-                  >
-                    <input
-                      aria-describedby="todo-description"
-                      type="checkbox"
-                      checked={todo.done}
-                      onChange={() => markTodoDone(todo)}
-                      className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
-                    />
-                    <div className="ml-2">
-                      <h5>{todo.title}</h5>
-                      <p>{todo.desc}</p>
-                      <p>{todo.assignTo}</p>
-                    </div>
+            {filteredTodos.length > 0 ? (
+              filteredTodos.map((todo) => (
+                <div
+                  key={todo.id}
+                  onClick={() => markTodoDone(todo)}
+                  className="flex p-2 mb-2 border border-gray-100 rounded-md cursor-pointer hover:bg-gray-50"
+                >
+                  <input
+                    aria-describedby="todo-description"
+                    type="checkbox"
+                    onChange={() => markTodoDone(todo)}
+                    checked={todo.done}
+                    className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
+                  />
+                  <div className="ml-2">
+                    <h5>{todo.title}</h5>
+                    <p>{todo.desc}</p>
+                    <p>{todo.assignTo}</p>
                   </div>
-                ))
-              : todos.map((todo) => (
-                  <div
-                    key={todo.id}
-                    className="flex p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
-                  >
-                    <input
-                      aria-describedby="todo-description"
-                      type="checkbox"
-                      checked={todo.done}
-                      onChange={() => markTodoDone(todo)}
-                      className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
-                    />
-                    <div className="ml-2">
-                      <h5>{todo.title}</h5>
-                      <p>{todo.desc}</p>
-                      <p>{todo.assignTo}</p>
-                    </div>
+                </div>
+              ))
+            ) : noFilteredTodos === true ? (
+              <p className="mt-4 text-center text-gray-400">
+                No matching tasks
+              </p>
+            ) : (
+              todos.map((todo) => (
+                <div
+                  key={todo.id}
+                  onClick={() => markTodoDone(todo)}
+                  className="flex p-2 mb-2 border border-gray-100 rounded-md cursor-pointer hover:bg-gray-50"
+                >
+                  <input
+                    aria-describedby="todo-description"
+                    type="checkbox"
+                    checked={todo.done}
+                    onChange={() => markTodoDone(todo)}
+                    className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
+                  />
+                  <div className="ml-2">
+                    <h5>{todo.title}</h5>
+                    <p>{todo.desc}</p>
+                    <p>{todo.assignTo}</p>
                   </div>
-                ))}
+                </div>
+              ))
+            )}
           </fieldset>
         ) : (
           <p className="mt-4 text-center text-gray-400">No tasks yet</p>
