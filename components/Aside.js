@@ -5,9 +5,9 @@ import Todos from "./Todos";
 import Events from "./Events";
 
 const tabs = [
+  { name: "Events", href: "#" },
   { name: "Tasks", href: "#" },
   { name: "Chat", href: "#" },
-  { name: "Events", href: "#" },
 ];
 
 export default function Aside() {
@@ -74,9 +74,9 @@ export default function Aside() {
         </div>
       </div>
       <div className="px-6 mt-12 mb-6 overflow-y-auto ">
+        {currentTab.name === "Events" && <Events />}
         {currentTab.name === "Tasks" && <Todos />}
         {currentTab.name === "Chat" && <Chat />}
-        {currentTab.name === "Events" && <Events />}
       </div>
     </div>
   );

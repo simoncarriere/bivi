@@ -1,5 +1,5 @@
 import { Fragment, useState, useEffect } from "react";
-import { Listbox, Transition } from "@headlessui/react";
+import { Listbox, Transition, Menu } from "@headlessui/react";
 import Image from "next/image";
 // Icons
 import {
@@ -8,6 +8,7 @@ import {
   CalendarIcon,
   PaperClipIcon,
   InboxStackIcon,
+  EllipsisVerticalIcon,
   TagIcon,
   UserCircleIcon,
 } from "@heroicons/react/20/solid";
@@ -23,6 +24,7 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  deleteDoc,
 } from "firebase/firestore";
 
 // Filter Data
@@ -182,6 +184,17 @@ const Todos = () => {
       updateDoc(todoDocRef, { done: !isChecked });
     } catch (e) {
       console.error("Error updating document: ", e);
+    }
+  };
+
+  const deleteTodo = async (taskId) => {
+    const taskRef = doc(db, "rooms", currentRoom.id, "todos", taskId);
+
+    try {
+      deleteDoc(taskRef);
+      console.log("Task successfully deleted!");
+    } catch (e) {
+      console.error("Error removing task: ", e);
     }
   };
 
@@ -419,8 +432,8 @@ const Todos = () => {
               filteredTodos.map((todo) => (
                 <div
                   key={todo.id}
-                  onClick={() => markTodoDone(todo)}
-                  className="flex p-2 mb-2 border border-gray-100 rounded-md cursor-pointer hover:bg-gray-50"
+                  // onClick={() => markTodoDone(todo)}
+                  className="flex justify-between w-full p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
                 >
                   <input
                     aria-describedby="todo-description"
@@ -434,6 +447,42 @@ const Todos = () => {
                     <p>{todo.desc}</p>
                     <p>{todo.assignTo}</p>
                   </div>
+                  <Menu
+                    as="div"
+                    className="relative flex-shrink-0 inline-block ml-2 text-left"
+                  >
+                    <Menu.Button className="relative inline-flex items-center justify-center w-8 h-8 bg-white rounded-full group focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                      <span className="sr-only">Open options menu</span>
+                      <span className="flex items-center justify-center w-full h-full rounded-full">
+                        <EllipsisVerticalIcon
+                          className="w-5 h-5 text-gray-400 group-hover:text-gray-500"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Menu.Button>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute top-0 z-10 w-48 origin-top-right bg-white rounded-md shadow-lg right-9 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="py-1">
+                          <Menu.Item>
+                            <div
+                              onClick={() => deleteTodo(todo.id)}
+                              className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50"
+                            >
+                              Delete Task
+                            </div>
+                          </Menu.Item>
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
                 </div>
               ))
             ) : noFilteredTodos === true ? (
@@ -444,21 +493,57 @@ const Todos = () => {
               todos.map((todo) => (
                 <div
                   key={todo.id}
-                  onClick={() => markTodoDone(todo)}
-                  className="flex p-2 mb-2 border border-gray-100 rounded-md cursor-pointer hover:bg-gray-50"
+                  // onClick={() => markTodoDone(todo)}
+                  className="flex justify-between w-full p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
                 >
                   <input
                     aria-describedby="todo-description"
                     type="checkbox"
                     checked={todo.done}
                     onChange={() => markTodoDone(todo)}
-                    className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded focus:ring-gray-600"
+                    className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
                   />
                   <div className="ml-2">
                     <h5>{todo.title}</h5>
                     <p>{todo.desc}</p>
                     <p>{todo.assignTo}</p>
                   </div>
+                  <Menu
+                    as="div"
+                    className="relative flex-shrink-0 inline-block ml-2 text-left"
+                  >
+                    <Menu.Button className="relative inline-flex items-center justify-center w-8 h-8 bg-white rounded-full group focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                      <span className="sr-only">Open options menu</span>
+                      <span className="flex items-center justify-center w-full h-full rounded-full">
+                        <EllipsisVerticalIcon
+                          className="w-5 h-5 text-gray-400 group-hover:text-gray-500"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Menu.Button>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute top-0 z-10 w-48 origin-top-right bg-white rounded-md shadow-lg right-9 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="py-1">
+                          <Menu.Item>
+                            <div
+                              onClick={() => deleteTodo(todo.id)}
+                              className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50"
+                            >
+                              Delete Task
+                            </div>
+                          </Menu.Item>
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
                 </div>
               ))
             )}
