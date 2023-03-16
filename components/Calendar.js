@@ -17,6 +17,7 @@ import {
   startOfHour,
   isSameDay,
   parse,
+  add,
 } from "date-fns";
 
 function classNames(...classes) {
@@ -30,28 +31,26 @@ export default function Calendar() {
   // var [currentTime, setCurrentTime] = useState(new Date());
 
   let today = startOfToday();
-  let [currentWeek, setCurrentWeek] = useState(format(today, "MMM ww, yyyy"));
 
-  // let firstDayCurrentWeek = parse(currentWeek, "MMM dd, yyyy", new Date());
+  let [currentWeek, setCurrentWeek] = useState(format(today, "ww"));
+  let firstDayCurrentWeek = parse(currentWeek, "ww", new Date());
   // console.log(currentWeek);
   // console.log(firstDayCurrentWeek);
 
   let thisWeek = eachDayOfInterval({
-    start: startOfWeek(today),
-    end: endOfWeek(today),
+    start: startOfWeek(firstDayCurrentWeek),
+    end: endOfWeek(firstDayCurrentWeek),
   });
-  // let thisMonth = eachDayOfInterval({
-  //   start: startOfMonth(today),
-  //   end: endOfMonth(today),
-  // });
 
-  // useEffect(() => {
-  //   var timer = setInterval(() => setCurrentTime(new Date()), 1000);
+  function previousWeek() {
+    let firstDayLastWeek = add(firstDayCurrentWeek, { weeks: -1 });
+    setCurrentWeek(format(firstDayLastWeek, "ww"));
+  }
 
-  //   return function cleanup() {
-  //     clearInterval(timer);
-  //   };
-  // });
+  function nextWeek() {
+    let firstDayNextWeek = add(firstDayCurrentWeek, { weeks: 1 });
+    setCurrentWeek(format(firstDayNextWeek, "ww"));
+  }
 
   // Set the container scroll position based on the current time. (TAILWIND UTILITY)
   useEffect(() => {
@@ -64,12 +63,20 @@ export default function Calendar() {
       1440;
   }, []);
 
+  // useEffect(() => {
+  //   var timer = setInterval(() => setCurrentTime(new Date()), 1000);
+
+  //   return function cleanup() {
+  //     clearInterval(timer);
+  //   };
+  // });
+
   return (
     <div className="flex flex-col h-full ">
       <header className="flex items-center justify-between flex-none px-6 py-4 ">
         <h1 className="text-lg font-semibold leading-6 text-gray-900">
-          <time dateTime={format(today, "yyyy-MM")}>
-            {format(today, "MMMM YYY")}
+          <time dateTime={format(firstDayCurrentWeek, "yyyy-MM")}>
+            {format(firstDayCurrentWeek, "MMMM YYY")}
           </time>
           {/* <p>{format(currentTime, "HH:mm")}</p> */}
         </h1>
@@ -82,6 +89,7 @@ export default function Calendar() {
             />
             <button
               type="button"
+              onClick={previousWeek}
               className="flex items-center justify-center py-2 pl-3 pr-4 text-gray-400 rounded-l-md hover:text-gray-500 focus:relative md:w-9 md:px-2 md:hover:bg-gray-50"
             >
               <span className="sr-only">Previous week</span>
@@ -89,12 +97,14 @@ export default function Calendar() {
             </button>
             <button
               type="button"
+              onClick={() => setCurrentWeek(format(today, "ww"))}
               className="hidden px-3.5 text-sm font-semibold text-gray-900 hover:bg-gray-50 focus:relative md:block"
             >
-              Today
+              This Week
             </button>
             <span className="relative w-px h-5 -mx-px bg-gray-300 md:hidden" />
             <button
+              onClick={nextWeek}
               type="button"
               className="flex items-center justify-center py-2 pl-4 pr-3 text-gray-400 rounded-r-md hover:text-gray-500 focus:relative md:w-9 md:px-2 md:hover:bg-gray-50"
             >
@@ -142,14 +152,23 @@ export default function Calendar() {
                     type="button"
                     className={classNames(
                       isToday
-                        ? " text-gray-900 border-b-2 border-emerald-300"
-                        : "text-gray-700",
-                      "flex  mx-auto justify-center items-center w-full pt-2 pb-3 gap-2"
+                        ? " text-emerald-600 bg-emerald-100 rounded-lg"
+                        : "text-gray-500",
+                      "flex  mx-auto justify-center items-center w-full gap-2 my-2 p-2"
                     )}
                     key={day.toString()}
                   >
                     {format(day, "eee")}
-                    <span className="font-semibold">{format(day, "dd")}</span>
+                    <span
+                      className={classNames(
+                        isToday
+                          ? "text-emerald-500 font-semibold bg-emerald-100 rounded-sm"
+                          : "text-gray-500",
+                        "px-1"
+                      )}
+                    >
+                      {format(day, "dd")}
+                    </span>
                   </button>
                 );
               })}
@@ -323,7 +342,7 @@ export default function Calendar() {
               </div>
 
               {/* Events */}
-              {/* <ol
+              <ol
                 className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"
                 style={{
                   gridTemplateRows: "1.75rem repeat(288, minmax(0, 1fr)) auto",
@@ -377,7 +396,7 @@ export default function Calendar() {
                     </p>
                   </a>
                 </li>
-              </ol> */}
+              </ol>
             </div>
           </div>
         </div>
