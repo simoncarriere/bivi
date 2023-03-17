@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-// import { Menu, Transition } from "@headlessui/react";
+// Hooks
+import { useAuthContext } from "../hooks/useAuthContext";
+// Libraries
 import {
   startOfToday,
   format,
@@ -12,17 +14,33 @@ import {
   parse,
   add,
 } from "date-fns";
+// Firebase
+import { db } from "../lib/firebase";
+import {
+  doc,
+  addDoc,
+  collection,
+  serverTimestamp,
+  onSnapshot,
+  deleteDoc,
+} from "firebase/firestore";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Calendar() {
+  const { user, currentRoom } = useAuthContext();
+  // Denomalize events locally
+  const [events, setEvents] = useState([]);
+  // Hanlde Calendar
   const container = useRef(null);
   const containerNav = useRef(null);
   const containerOffset = useRef(null);
+  // Grab Current TIme
   // var [currentTime, setCurrentTime] = useState(new Date());
 
+  // Handle Dates
   let today = startOfToday();
 
   let [currentWeek, setCurrentWeek] = useState(format(today, "ww"));
@@ -43,6 +61,22 @@ export default function Calendar() {
     setCurrentWeek(format(firstDayNextWeek, "ww"));
   }
 
+  // Grab the Events from the current room
+  useEffect(() => {
+    let ref = collection(db, "rooms", currentRoom.id, "meetings");
+
+    const unsub = onSnapshot(ref, (snapshot) => {
+      let results = [];
+      snapshot.docs.forEach((doc) => {
+        results.push({ ...doc.data(), id: doc.id });
+      });
+      setEvents(results);
+    });
+
+    return () => unsub();
+  }, [currentRoom]);
+  console.log(events);
+
   // Set the container scroll position based on the current time. (TAILWIND UTILITY)
   // useEffect(() => {
   //   const currentMinute = new Date().getHours() * 60;
@@ -56,7 +90,6 @@ export default function Calendar() {
 
   // useEffect(() => {
   //   var timer = setInterval(() => setCurrentTime(new Date()), 1000);
-
   //   return function cleanup() {
   //     clearInterval(timer);
   //   };
@@ -443,6 +476,17 @@ export default function Calendar() {
     </div>
   );
 }
+
+// Handle position of events depending on day of week
+let colStartClasses = [
+  "",
+  "col-start-2",
+  "col-start-3",
+  "col-start-4",
+  "col-start-5",
+  "col-start-6",
+  "col-start-7",
+];
 
 {
   /* <div className="hidden md:ml-4 md:flex md:items-center">

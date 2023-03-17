@@ -5,11 +5,7 @@ import { format, parseISO, parse } from "date-fns";
 // Icons
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-
-const Meeting = ({ event }) => {
+const Meeting = ({ event, deleteEvent }) => {
   // let startDatetime = parseISO(meeting.startDatetime);
   // let endDatetime = parseISO(meeting.endDatetime);
 
@@ -19,7 +15,7 @@ const Meeting = ({ event }) => {
   return (
     <li
       key={event.id}
-      className="flex items-center p-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100"
+      className="flex items-center p-2.5 space-x-4 group rounded-md bg-gray-50 focus-within:bg-gray-100 hover:bg-gray-100"
     >
       {/* <img
           src={meeting.imageUrl}
@@ -41,6 +37,42 @@ const Meeting = ({ event }) => {
         </p>
       </div>
       <Menu
+        as="div"
+        className="relative flex-shrink-0 inline-block ml-2 text-left"
+      >
+        <Menu.Button className="relative inline-flex items-center justify-center w-8 h-8 bg-white rounded-full group focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+          <span className="sr-only">Open options menu</span>
+          <span className="flex items-center justify-center w-full h-full rounded-full">
+            <EllipsisVerticalIcon
+              className="w-5 h-5 text-gray-400 group-hover:text-gray-500"
+              aria-hidden="true"
+            />
+          </span>
+        </Menu.Button>
+        <Transition
+          as={Fragment}
+          enter="transition ease-out duration-100"
+          enterFrom="transform opacity-0 scale-95"
+          enterTo="transform opacity-100 scale-100"
+          leave="transition ease-in duration-75"
+          leaveFrom="transform opacity-100 scale-100"
+          leaveTo="transform opacity-0 scale-95"
+        >
+          <Menu.Items className="absolute top-0 z-10 w-48 origin-top-right bg-white rounded-md shadow-lg right-9 ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <div className="py-1">
+              <Menu.Item>
+                <div
+                  onClick={() => deleteEvent(event.id)}
+                  className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50"
+                >
+                  Delete Task
+                </div>
+              </Menu.Item>
+            </div>
+          </Menu.Items>
+        </Transition>
+      </Menu>
+      {/* <Menu
         as="div"
         className="relative opacity-0 focus-within:opacity-100 group-hover:opacity-100"
       >
@@ -91,7 +123,7 @@ const Meeting = ({ event }) => {
             </div>
           </Menu.Items>
         </Transition>
-      </Menu>
+      </Menu> */}
     </li>
   );
 };

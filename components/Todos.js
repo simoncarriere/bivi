@@ -161,8 +161,9 @@ const Todos = () => {
       addDoc(roomTodoRef, {
         title: todoTitle,
         desc: todoDescription,
-        // assignTo: assignTo,
+
         assignTo: assignTo.uid,
+        assignToName: assignTo.displayName,
         done: false,
         createdAt: serverTimestamp(),
       }).then((docRef) => {
@@ -446,7 +447,7 @@ const Todos = () => {
                     <div className="ml-2">
                       <h5>{todo.title}</h5>
                       <p>{todo.desc}</p>
-                      <p>{todo.assignTo}</p>
+                      <p className="mt-0.5">{todo.assignToName}</p>
                     </div>
                   </div>
                   <Menu
@@ -496,7 +497,8 @@ const Todos = () => {
                 <div
                   key={todo.id}
                   // onClick={() => markTodoDone(todo)}
-                  className="flex justify-between w-full p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
+                  className="flex justify-between w-full p-2.5 mb-2 rounded-md bg-gray-50 hover:bg-gray-50"
+                  // className="flex justify-between w-full p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
                 >
                   <div className="flex">
                     <input
@@ -509,7 +511,7 @@ const Todos = () => {
                     <div className="ml-2">
                       <h5>{todo.title}</h5>
                       <p>{todo.desc}</p>
-                      <p>{todo.assignTo}</p>
+                      <p>{todo.assignToName}</p>
                     </div>
                   </div>
                   <Menu

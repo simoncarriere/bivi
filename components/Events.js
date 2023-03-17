@@ -1,8 +1,6 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 // Hooks
 import { useAuthContext } from "../hooks/useAuthContext";
-import { useSubcollection } from "../hooks/useSubcollection";
-
 // Libraries
 import {
   startOfToday,
@@ -29,57 +27,21 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 // FIrebase
 import { db } from "../lib/firebase";
 import {
+  doc,
   addDoc,
   collection,
   serverTimestamp,
   onSnapshot,
+  deleteDoc,
 } from "firebase/firestore";
-
-const meetings = [
-  {
-    id: 1,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    start: "1:00 PM",
-    startDatetime: "2023-03-21T13:00",
-    end: "2:30 PM",
-    endDatetime: "2023-03-21T14:30",
-  },
-  {
-    id: 1,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    start: "1:00 PM",
-    startDatetime: "2023-03-18T13:00",
-    end: "2:30 PM",
-    endDatetime: "2023-03-18T14:30",
-  },
-  {
-    id: 1,
-    name: "Leslie Alexander",
-    imageUrl:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    start: "1:00 PM",
-    startDatetime: "2023-04-01T13:00",
-    end: "2:30 PM",
-    endDatetime: "2023-04-01T14:30",
-  },
-  // More meetings...
-];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 const Events = () => {
-  const { user, currentRoom } = useAuthContext();
-  const [events, setEvents] = useState([]);
+  const { currentRoom } = useAuthContext();
 
-  // Initialize Today
-  let today = startOfToday();
-  const [selectedDay, setSelectedDay] = useState(today);
   // Form State
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
@@ -87,25 +49,44 @@ const Events = () => {
   const [eventDate, setEventDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
+  // Initialize Today
+  let today = startOfToday();
+  const [selectedDay, setSelectedDay] = useState(today);
+  // Denomalize events locally
+  const [events, setEvents] = useState([]);
 
+  // Handle calender days and months
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
   let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
-
   let days = eachDayOfInterval({
     start: startOfWeek(firstDayCurrentMonth),
     end: endOfWeek(endOfMonth(firstDayCurrentMonth)),
   });
-
   function previousMonth() {
     let firstDayNextMonth = add(firstDayCurrentMonth, { months: -1 });
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
-
   function nextMonth() {
     let firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
+  // Grab the Events from the current room
+  useEffect(() => {
+    let ref = collection(db, "rooms", currentRoom.id, "meetings");
+
+    const unsub = onSnapshot(ref, (snapshot) => {
+      let results = [];
+      snapshot.docs.forEach((doc) => {
+        results.push({ ...doc.data(), id: doc.id });
+      });
+      setEvents(results);
+    });
+
+    return () => unsub();
+  }, [currentRoom]);
+
+  // Filter events by selected day
   let selectedDayEvents = events.filter((event) =>
     isSameDay(parseISO(event.eventDate), selectedDay)
   );
@@ -136,36 +117,15 @@ const Events = () => {
     setEndTime("");
   };
 
-  // Grab the Meetings from the current room
-  useEffect(() => {
-    let ref = collection(db, "rooms", currentRoom.id, "meetings");
-    // let ref = query(
-    //   collection(db, "rooms", currentRoom.id, "meetings"),
-    //   orderBy("sentAt", "desc"),
-    //   limit(30)
-    // );
-    const unsub = onSnapshot(ref, (snapshot) => {
-      let results = [];
-      snapshot.docs.forEach((doc) => {
-        results.push({ ...doc.data(), id: doc.id });
-      });
-      console.log("Results", results);
-      setEvents(results);
-    });
-
-    return () => unsub();
-  }, [currentRoom]);
-
-  // let a = events[0];
-  // console.log(a);
-
-  // const y = parseISO("2023-03-21T13:00");
-
-  // console.log(parseISO("2023-03-21:19:03"));
-  // let x = parseISO("2023-03-21");
-  // console.log(x);
-  // console.log(parse("17:00", "HH:mm", new Date()));
-  // console.log(parse("17:00", "HH:mm", x));
+  const deleteEvent = async (eventId) => {
+    let eventRef = doc(db, "rooms", currentRoom.id, "meetings", eventId);
+    try {
+      deleteDoc(eventRef);
+      console.log("Meeting successfully deleted!");
+    } catch (e) {
+      console.error("Error removing meeting: ", e);
+    }
+  };
 
   return (
     <div>
@@ -192,6 +152,7 @@ const Events = () => {
         </button>
       </div>
       {/* Calendar */}
+      {/* Days of Week */}
       <div className="grid grid-cols-7 mt-4 text-xs leading-6 text-center text-gray-500">
         <div>S</div>
         <div>M</div>
@@ -201,6 +162,7 @@ const Events = () => {
         <div>F</div>
         <div>S</div>
       </div>
+      {/* Days of Month */}
       <div className="grid grid-cols-7 mt-2 text-sm">
         {days.map((day, dayIdx) => (
           <div
@@ -260,40 +222,13 @@ const Events = () => {
         </h2>
         {selectedDayEvents.length > 0 ? (
           selectedDayEvents.map((event) => (
-            <Meeting event={event} key={event.id} />
+            <Meeting event={event} deleteEvent={deleteEvent} key={event.id} />
           ))
         ) : (
-          // <ol>
-          //   {events.map((event) => {
-          //     let eventDate = parseISO(event.eventDate);
-          //     let startTime = parse(event.startTime, "HH:mm", eventDate);
-          //     let endTime = parse(event.endTime, "HH:mm", eventDate);
-          //     return (
-          //       <div
-          //         key={event.id}
-          //         className="flex justify-between w-full gap-2"
-          //       >
-          //         <p>{event.title}</p>
-          //         {/* <p>{event.description}</p> */}
-          //         <p>{format(startTime, "H:mm a, dd MMM")}</p>
-          //         {/* <p>{format(endTime, "H:mm a, dd MMM")}</p> */}
-          //         {/* <time>{parseISO(event.eventDate)}</time> */}
-          //       </div>
-          //     );
-          //   })}
-          // </ol>
-          <p>No meetings scheduled on selected day</p>
+          <p className="mt-4 text-gray-400">
+            No meetings scheduled on selected day
+          </p>
         )}
-        {/* 
-        <ol className="mt-4 space-y-1 text-sm leading-6 text-gray-500">
-          {selectedDayMeetings.length > 0 ? (
-            selectedDayMeetings.map((meeting) => (
-              <Meeting meeting={meeting} key={meeting.id} />
-            ))
-          ) : (
-            <p>No meetings scheduled on selected day</p>
-          )}
-        </ol> */}
       </section>
       {/* Add Event Form */}
       <div className="fixed bottom-0 pb-4 bg-white -right-1 w-96">
@@ -345,7 +280,7 @@ const Events = () => {
               <div className="flex gap-2">
                 <div className="flex-1 w-full mt-2 mb-1">
                   <label htmlFor="starttime" className="text-xs text-gray-400">
-                    Start Time
+                    From
                   </label>
                   <input
                     value={startTime}
@@ -359,7 +294,7 @@ const Events = () => {
                 </div>
                 <div className="flex-1 w-full mt-2 mb-1">
                   <label htmlFor="endtime" className="text-xs text-gray-400">
-                    End Time
+                    To
                   </label>
                   <input
                     value={endTime}
