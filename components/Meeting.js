@@ -15,7 +15,7 @@ const Meeting = ({ event, deleteEvent }) => {
   return (
     <li
       key={event.id}
-      className="flex items-center p-2.5 space-x-4 group rounded-md bg-gray-50 focus-within:bg-gray-100 hover:bg-gray-100"
+      className="flex items-center p-2.5 mb-2 space-x-4 group rounded-md bg-gray-50 focus-within:bg-gray-100 hover:bg-gray-100"
     >
       {/* <img
           src={meeting.imageUrl}
@@ -65,7 +65,7 @@ const Meeting = ({ event, deleteEvent }) => {
                   onClick={() => deleteEvent(event.id)}
                   className="block px-4 py-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50"
                 >
-                  Delete Task
+                  Delete Meeting
                 </div>
               </Menu.Item>
             </div>

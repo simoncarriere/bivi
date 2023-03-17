@@ -28,7 +28,7 @@ import {
 } from "firebase/firestore";
 
 // Filter Data
-const assignees = [{ displayName: "Unassigned", email: null, uid: 1 }];
+const assignees = [{ displayName: "Open", email: null, uid: 1 }];
 const labels = [
   { name: "All", value: null },
   { name: "Active", value: false },
@@ -103,11 +103,11 @@ const Todos = () => {
             todo.done === labelled.value && todo.assignTo === assigned.uid
         );
         if (filteredTodos.length > 0) {
-          console.log(filteredTodos.length);
+          // console.log(filteredTodos.length);
           setFilteredTodos(filteredTodos);
           return;
         } else {
-          console.log(filteredTodos.length);
+          // console.log(filteredTodos.length);
           setNoFilteredTodos(true);
           setFilteredTodos([]);
           console.log("no todos");
@@ -120,11 +120,11 @@ const Todos = () => {
           (todo) => todo.done === labelled.value
         );
         if (filteredTodos.length > 0) {
-          console.log(filteredTodos.length);
+          // console.log(filteredTodos.length);
           setFilteredTodos(filteredTodos);
           return;
         } else {
-          console.log(filteredTodos.length);
+          // console.log(filteredTodos.length);
           setNoFilteredTodos(true);
           setFilteredTodos([]);
           console.log("no todos");
@@ -137,11 +137,11 @@ const Todos = () => {
           (todo) => todo.assignTo === assigned.uid
         );
         if (filteredTodos.length > 0) {
-          console.log(filteredTodos.length);
+          // console.log(filteredTodos.length);
           setFilteredTodos(filteredTodos);
           return;
         } else {
-          console.log(filteredTodos.length);
+          // console.log(filteredTodos.length);
           setNoFilteredTodos(true);
           setFilteredTodos([]);
           console.log("no todos");
@@ -445,8 +445,8 @@ const Todos = () => {
                       className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
                     />
                     <div className="ml-2">
-                      <h5>{todo.title}</h5>
-                      <p>{todo.desc}</p>
+                      <p className="text-gray-900 ">{todo.title}</p>
+                      {/* <p>{todo.desc}</p> */}
                       <p className="mt-0.5">{todo.assignToName}</p>
                     </div>
                   </div>
@@ -509,8 +509,8 @@ const Todos = () => {
                       className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
                     />
                     <div className="ml-2">
-                      <h5>{todo.title}</h5>
-                      <p>{todo.desc}</p>
+                      <p className="text-gray-900 ">{todo.title}</p>
+                      {/* <p>{todo.desc}</p> */}
                       <p>{todo.assignToName}</p>
                     </div>
                   </div>

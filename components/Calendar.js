@@ -11,7 +11,9 @@ import {
   endOfWeek,
   startOfHour,
   isSameDay,
+  isSameWeek,
   parse,
+  parseISO,
   add,
 } from "date-fns";
 // Firebase
@@ -24,6 +26,7 @@ import {
   onSnapshot,
   deleteDoc,
 } from "firebase/firestore";
+import Meeting from "./Meeting";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -68,14 +71,39 @@ export default function Calendar() {
     const unsub = onSnapshot(ref, (snapshot) => {
       let results = [];
       snapshot.docs.forEach((doc) => {
-        results.push({ ...doc.data(), id: doc.id });
+        let weekday = format(parseISO(doc.data().eventDate), "e");
+        results.push({
+          ...doc.data(),
+          id: doc.id,
+          weekday: weekday,
+        });
+        // console.log(weekday);
+        // console.log(
+        //   format(parseISO(doc.data().eventDate), "e"),
+        //   format(firstDayCurrentWeek, "e")
+        // );
       });
       setEvents(results);
+
+      // console.log(results);
     });
 
     return () => unsub();
   }, [currentRoom]);
-  console.log(events);
+
+  // const deleteEvent = async (eventId) => {
+  //   let eventRef = doc(db, "rooms", currentRoom.id, "meetings", eventId);
+  //   try {
+  //     deleteDoc(eventRef);
+  //     console.log("Meeting successfully deleted!");
+  //   } catch (e) {
+  //     console.error("Error removing meeting: ", e);
+  //   }
+  // };
+
+  // console.log(parse(firstDayCurrentWeek));
+
+  // Handle Events
 
   // Set the container scroll position based on the current time. (TAILWIND UTILITY)
   // useEffect(() => {
@@ -358,62 +386,44 @@ export default function Calendar() {
               </div> */}
 
               {/* Vertical lines */}
-              <div className="hidden grid-cols-7 col-start-1 col-end-2 grid-rows-1 row-start-1 divide-x divide-gray-100 sm:grid sm:grid-cols-7">
-                <div className="col-start-1 row-span-full" />
-                <div className="col-start-2 row-span-full" />
-                <div className="col-start-3 row-span-full" />
-                <div className="col-start-4 row-span-full" />
-                <div className="col-start-5 row-span-full" />
-                <div className="col-start-6 row-span-full" />
-                <div className="col-start-7 row-span-full" />
+              {/* divide-gray-100 divide-x*/}
+              {/* <p>Test</p> */}
+              {/* const isToday = isSameDay(day, new Date()); */}
+              <div className="hidden grid-cols-7 col-start-1 col-end-2 grid-rows-6 row-start-1 sm:grid sm:grid-cols-7">
+                {events
+                  .filter((event) =>
+                    isSameWeek(parseISO(event.eventDate), firstDayCurrentWeek)
+                  )
+                  .map((event) => {
+                    let eventDate = parseISO(event.eventDate);
+                    let startTime = parse(event.startTime, "HH:mm", eventDate);
+                    let endTime = parse(event.endTime, "HH:mm", eventDate);
+                    return (
+                      <div
+                        key={event.id}
+                        className={`col-start-${event.weekday} row-start-1 row-span-1 hover:bg-gray-50 border border-gray-200 p-2 rounded-md my-2`}
+                      >
+                        <p className="mt-0.5">
+                          <time dateTime={startTime}>
+                            {format(startTime, "h:mm ")}
+                          </time>{" "}
+                          -{" "}
+                          <time dateTime={endTime}>
+                            {format(endTime, "h:mm a")}
+                          </time>
+                        </p>
+                        <p className="text-gray-900">{event.title}</p>
+                      </div>
+                    );
+                  })}
+
                 <div className="w-8 col-start-8 row-span-full" />
               </div>
 
               {/* Events */}
               {/* 7 columns */}
               {/* <ol className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"> */}
-              <ol className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8">
-                <li className="relative h-32 sm:col-start-3">
-                  <a
-                    href="#"
-                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-blue-50 hover:bg-blue-100"
-                  >
-                    <p className="order-1 font-semibold text-blue-700">
-                      Breakfast
-                    </p>
-                    <p className="text-blue-500 group-hover:text-blue-700">
-                      <time dateTime="2022-01-12T06:00">6:00 AM</time>
-                    </p>
-                  </a>
-                </li>
 
-                <li className="relative h-32 sm:col-start-3">
-                  <a
-                    href="#"
-                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-pink-50 hover:bg-pink-100"
-                  >
-                    <p className="order-1 font-semibold text-pink-700">
-                      Flight to Paris
-                    </p>
-                    <p className="text-pink-500 group-hover:text-pink-700">
-                      <time dateTime="2022-01-12T07:30">7:30 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li className="relative h-32 sm:col-start-6">
-                  <a
-                    href="#"
-                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-gray-100 rounded-lg group inset-1 hover:bg-gray-200"
-                  >
-                    <p className="order-1 font-semibold text-gray-700">
-                      Meeting with design team at Disney
-                    </p>
-                    <p className="text-gray-500 group-hover:text-gray-700">
-                      <time dateTime="2022-01-15T10:00">10:00 AM</time>
-                    </p>
-                  </a>
-                </li>
-              </ol>
               {/* <ol
                 className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"
                 style={{
