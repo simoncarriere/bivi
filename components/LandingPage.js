@@ -49,7 +49,18 @@ export default function LandingPage() {
               <span className="text-emerald-300 animate-pulse">together</span>.
             </h1>
             <p className="leading-6 text-center text-gray-400 sm:leading-8 sm:text-lg ">
-              Multiplater task & scheduling for ambitious async teams.
+              Supercharge your team's productivity with Bivi. Schedule meetings,
+              assign tasks, and keep track of conversations in real-time.
+              {/* Supercharge your team's productivity with Bivi – the all-in-one
+              tool for small ambitious teams. Schedule meetings, assign tasks,
+              and keep track of conversations in real-time. */}
+              {/* Supercharge your team with Bivi – Schedule meetings, assign tasks,
+              and keep track of conversations in real-time. */}
+              {/* Sign up now and start collaborating more efficiently! */}
+              {/* Bivi is the perfect companion for small ambitious team to schedule
+              and organize all your meetings, tasks and conversation in real
+              time */}
+              {/* Multiplater task & scheduling for ambitious async teams. */}
             </p>
           </div>
           <div className="flex justify-center ">

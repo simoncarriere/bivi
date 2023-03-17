@@ -435,17 +435,19 @@ const Todos = () => {
                   // onClick={() => markTodoDone(todo)}
                   className="flex justify-between w-full p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
                 >
-                  <input
-                    aria-describedby="todo-description"
-                    type="checkbox"
-                    onChange={() => markTodoDone(todo)}
-                    checked={todo.done}
-                    className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
-                  />
-                  <div className="ml-2">
-                    <h5>{todo.title}</h5>
-                    <p>{todo.desc}</p>
-                    <p>{todo.assignTo}</p>
+                  <div className="flex">
+                    <input
+                      aria-describedby="todo-description"
+                      type="checkbox"
+                      onChange={() => markTodoDone(todo)}
+                      checked={todo.done}
+                      className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
+                    />
+                    <div className="ml-2">
+                      <h5>{todo.title}</h5>
+                      <p>{todo.desc}</p>
+                      <p>{todo.assignTo}</p>
+                    </div>
                   </div>
                   <Menu
                     as="div"
@@ -496,17 +498,19 @@ const Todos = () => {
                   // onClick={() => markTodoDone(todo)}
                   className="flex justify-between w-full p-2 mb-2 border border-gray-100 rounded-md hover:bg-gray-50"
                 >
-                  <input
-                    aria-describedby="todo-description"
-                    type="checkbox"
-                    checked={todo.done}
-                    onChange={() => markTodoDone(todo)}
-                    className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
-                  />
-                  <div className="ml-2">
-                    <h5>{todo.title}</h5>
-                    <p>{todo.desc}</p>
-                    <p>{todo.assignTo}</p>
+                  <div className="flex">
+                    <input
+                      aria-describedby="todo-description"
+                      type="checkbox"
+                      checked={todo.done}
+                      onChange={() => markTodoDone(todo)}
+                      className="w-4 h-4 m-1 text-gray-600 border-gray-300 rounded cursor-pointer focus:ring-gray-600"
+                    />
+                    <div className="ml-2">
+                      <h5>{todo.title}</h5>
+                      <p>{todo.desc}</p>
+                      <p>{todo.assignTo}</p>
+                    </div>
                   </div>
                   <Menu
                     as="div"

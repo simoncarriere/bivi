@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 // Hooks
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useDocument } from "../hooks/useDocument";
-// FIrebase
+// Firebase
 import { db } from "../lib/firebase";
 import {
   collection,
@@ -36,7 +36,6 @@ const Chat = () => {
       orderBy("sentAt", "desc"),
       limit(30)
     );
-
     const unsub = onSnapshot(ref, (snapshot) => {
       let results = [];
       snapshot.docs.forEach((doc) => {

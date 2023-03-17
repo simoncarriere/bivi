@@ -7,7 +7,7 @@ import Events from "./Events";
 const tabs = [
   { name: "Events", href: "#" },
   { name: "Tasks", href: "#" },
-  { name: "Chat", href: "#" },
+  { name: "Conversations", href: "#" },
 ];
 
 export default function Aside() {
@@ -76,7 +76,7 @@ export default function Aside() {
       <div className="px-6 mt-12 mb-6 overflow-y-auto ">
         {currentTab.name === "Events" && <Events />}
         {currentTab.name === "Tasks" && <Todos />}
-        {currentTab.name === "Chat" && <Chat />}
+        {currentTab.name === "Conversations" && <Chat />}
       </div>
     </div>
   );

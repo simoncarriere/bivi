@@ -62,7 +62,7 @@ const SignUp = () => {
                       onSubmit={handleSubmit}
                       className="flex flex-col gap-2 p-6"
                     >
-                      <Dialog.Title as="h1" className="mb-4">
+                      <Dialog.Title as="h1" className="mb-4 text-2xl">
                         Hey stranger! Let&apos;s get aquainted.
                       </Dialog.Title>
                       <input

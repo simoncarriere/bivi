@@ -1,17 +1,10 @@
-import { Fragment, useState, useEffect, useRef } from "react";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  EllipsisHorizontalIcon,
-} from "@heroicons/react/20/solid";
-import { Menu, Transition } from "@headlessui/react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+// import { Menu, Transition } from "@headlessui/react";
 import {
   startOfToday,
   format,
   eachDayOfInterval,
-  startOfMonth,
-  endOfMonth,
   startOfWeek,
   endOfWeek,
   startOfHour,
@@ -34,8 +27,6 @@ export default function Calendar() {
 
   let [currentWeek, setCurrentWeek] = useState(format(today, "ww"));
   let firstDayCurrentWeek = parse(currentWeek, "ww", new Date());
-  // console.log(currentWeek);
-  // console.log(firstDayCurrentWeek);
 
   let thisWeek = eachDayOfInterval({
     start: startOfWeek(firstDayCurrentWeek),
@@ -53,15 +44,15 @@ export default function Calendar() {
   }
 
   // Set the container scroll position based on the current time. (TAILWIND UTILITY)
-  useEffect(() => {
-    const currentMinute = new Date().getHours() * 60;
-    container.current.scrollTop =
-      ((container.current.scrollHeight -
-        containerNav.current.offsetHeight -
-        containerOffset.current.offsetHeight) *
-        currentMinute) /
-      1440;
-  }, []);
+  // useEffect(() => {
+  //   const currentMinute = new Date().getHours() * 60;
+  //   container.current.scrollTop =
+  //     ((container.current.scrollHeight -
+  //       containerNav.current.offsetHeight -
+  //       containerOffset.current.offsetHeight) *
+  //       currentMinute) /
+  //     1440;
+  // }, []);
 
   // useEffect(() => {
   //   var timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -114,14 +105,17 @@ export default function Calendar() {
           </div>
         </div>
       </header>
+      {/* Calendar */}
       <div
         ref={container}
-        className="flex flex-col flex-auto overflow-auto bg-white cursor-not-allowed isolate hover:brightness-90"
+        className="flex flex-col flex-auto overflow-auto bg-white "
+        // className="flex flex-col flex-auto overflow-auto bg-white cursor-not-allowed isolate hover:brightness-90"
       >
         <div
           style={{ width: "165%" }}
-          className="flex flex-col flex-none max-w-full sm:max-w-none md:max-w-full"
+          className="flex flex-col flex-none h-full max-w-full isolate sm:max-w-none md:max-w-full"
         >
+          {/* Days */}
           <div
             ref={containerNav}
             className="sticky top-0 z-30 flex-none bg-white shadow sm:pr-8"
@@ -152,9 +146,9 @@ export default function Calendar() {
                     type="button"
                     className={classNames(
                       isToday
-                        ? " text-emerald-600 bg-emerald-100 rounded-lg"
+                        ? " text-gray-100 bg-gray-800 rounded-lg font-semibold"
                         : "text-gray-500",
-                      "flex  mx-auto justify-center items-center w-full gap-2 my-2 p-2"
+                      "flex  mx-auto justify-center items-center w-full gap-2 my-2 py-1 "
                     )}
                     key={day.toString()}
                   >
@@ -162,9 +156,9 @@ export default function Calendar() {
                     <span
                       className={classNames(
                         isToday
-                          ? "text-emerald-500 font-semibold bg-emerald-100 rounded-sm"
+                          ? "text-gray-100 font-semibold "
                           : "text-gray-500",
-                        "px-1"
+                        ""
                       )}
                     >
                       {format(day, "dd")}
@@ -174,11 +168,12 @@ export default function Calendar() {
               })}
             </div>
           </div>
+          {/* Events */}
           <div className="flex flex-auto">
             <div className="sticky left-0 z-10 flex-none bg-white w-14 ring-1 ring-gray-100" />
             <div className="grid flex-auto grid-cols-1 grid-rows-1">
               {/* Horizontal lines */}
-              <div
+              {/* <div
                 className="grid col-start-1 col-end-2 row-start-1 divide-y divide-gray-100"
                 style={{ gridTemplateRows: "repeat(48, minmax(3.5rem, 1fr))" }}
               >
@@ -327,7 +322,7 @@ export default function Calendar() {
                   </div>
                 </div>
                 <div />
-              </div>
+              </div> */}
 
               {/* Vertical lines */}
               <div className="hidden grid-cols-7 col-start-1 col-end-2 grid-rows-1 row-start-1 divide-x divide-gray-100 sm:grid sm:grid-cols-7">
@@ -342,7 +337,51 @@ export default function Calendar() {
               </div>
 
               {/* Events */}
-              <ol
+              {/* 7 columns */}
+              {/* <ol className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"> */}
+              <ol className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8">
+                <li className="relative h-32 sm:col-start-3">
+                  <a
+                    href="#"
+                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-blue-50 hover:bg-blue-100"
+                  >
+                    <p className="order-1 font-semibold text-blue-700">
+                      Breakfast
+                    </p>
+                    <p className="text-blue-500 group-hover:text-blue-700">
+                      <time dateTime="2022-01-12T06:00">6:00 AM</time>
+                    </p>
+                  </a>
+                </li>
+
+                <li className="relative h-32 sm:col-start-3">
+                  <a
+                    href="#"
+                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-pink-50 hover:bg-pink-100"
+                  >
+                    <p className="order-1 font-semibold text-pink-700">
+                      Flight to Paris
+                    </p>
+                    <p className="text-pink-500 group-hover:text-pink-700">
+                      <time dateTime="2022-01-12T07:30">7:30 AM</time>
+                    </p>
+                  </a>
+                </li>
+                <li className="relative h-32 sm:col-start-6">
+                  <a
+                    href="#"
+                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-gray-100 rounded-lg group inset-1 hover:bg-gray-200"
+                  >
+                    <p className="order-1 font-semibold text-gray-700">
+                      Meeting with design team at Disney
+                    </p>
+                    <p className="text-gray-500 group-hover:text-gray-700">
+                      <time dateTime="2022-01-15T10:00">10:00 AM</time>
+                    </p>
+                  </a>
+                </li>
+              </ol>
+              {/* <ol
                 className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"
                 style={{
                   gridTemplateRows: "1.75rem repeat(288, minmax(0, 1fr)) auto",
@@ -396,7 +435,7 @@ export default function Calendar() {
                     </p>
                   </a>
                 </li>
-              </ol>
+              </ol> */}
             </div>
           </div>
         </div>

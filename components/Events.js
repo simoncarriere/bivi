@@ -1,4 +1,9 @@
 import { useState, useEffect, Fragment } from "react";
+// Hooks
+import { useAuthContext } from "../hooks/useAuthContext";
+import { useSubcollection } from "../hooks/useSubcollection";
+
+// Libraries
 import {
   startOfToday,
   format,
@@ -17,9 +22,18 @@ import {
   getDay,
   parseISO,
 } from "date-fns";
+// Components
+import Meeting from "./Meeting";
+// Icons
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+// FIrebase
+import { db } from "../lib/firebase";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  onSnapshot,
+} from "firebase/firestore";
 
 const meetings = [
   {
@@ -60,10 +74,19 @@ function classNames(...classes) {
 }
 
 const Events = () => {
+  const { user, currentRoom } = useAuthContext();
+  const [events, setEvents] = useState([]);
+
+  // Initialize Today
   let today = startOfToday();
   const [selectedDay, setSelectedDay] = useState(today);
+  // Form State
   const [eventTitle, setEventTitle] = useState("");
   const [eventDescription, setEventDescription] = useState("");
+  const [eventLocation, setEventLocation] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   let [currentMonth, setCurrentMonth] = useState(format(today, "MMM-yyyy"));
   let firstDayCurrentMonth = parse(currentMonth, "MMM-yyyy", new Date());
@@ -83,13 +106,67 @@ const Events = () => {
     setCurrentMonth(format(firstDayNextMonth, "MMM-yyyy"));
   }
 
-  let selectedDayMeetings = meetings.filter((meeting) =>
-    isSameDay(parseISO(meeting.startDatetime), selectedDay)
+  let selectedDayEvents = events.filter((event) =>
+    isSameDay(parseISO(event.eventDate), selectedDay)
   );
+
+  // Add a new meeting
   const addEvent = (e) => {
     e.preventDefault();
-    console.log("add event", eventTitle, eventDescription);
+
+    const roomMeetingsRef = collection(db, "rooms", currentRoom.id, "meetings");
+
+    try {
+      addDoc(roomMeetingsRef, {
+        title: eventTitle,
+        description: eventDescription,
+        startTime: startTime,
+        endTime: endTime,
+        eventDate: eventDate,
+      }).then((docRef) => {
+        console.log("Document written with ID: ", docRef.id);
+      });
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+    setEventTitle("");
+    setEventDescription("");
+    setEventDate("");
+    setStartTime("");
+    setEndTime("");
   };
+
+  // Grab the Meetings from the current room
+  useEffect(() => {
+    let ref = collection(db, "rooms", currentRoom.id, "meetings");
+    // let ref = query(
+    //   collection(db, "rooms", currentRoom.id, "meetings"),
+    //   orderBy("sentAt", "desc"),
+    //   limit(30)
+    // );
+    const unsub = onSnapshot(ref, (snapshot) => {
+      let results = [];
+      snapshot.docs.forEach((doc) => {
+        results.push({ ...doc.data(), id: doc.id });
+      });
+      console.log("Results", results);
+      setEvents(results);
+    });
+
+    return () => unsub();
+  }, [currentRoom]);
+
+  // let a = events[0];
+  // console.log(a);
+
+  // const y = parseISO("2023-03-21T13:00");
+
+  // console.log(parseISO("2023-03-21:19:03"));
+  // let x = parseISO("2023-03-21");
+  // console.log(x);
+  // console.log(parse("17:00", "HH:mm", new Date()));
+  // console.log(parse("17:00", "HH:mm", x));
+
   return (
     <div>
       {/* Header */}
@@ -164,8 +241,8 @@ const Events = () => {
             </button>
 
             <div className="w-1 h-1 mx-auto mt-1">
-              {meetings.some((meeting) =>
-                isSameDay(parseISO(meeting.startDatetime), day)
+              {events.some((event) =>
+                isSameDay(parseISO(event.eventDate), day)
               ) && (
                 <div className="w-1 h-1 rounded-full bg-emerald-600 animate-pulse"></div>
               )}
@@ -181,24 +258,48 @@ const Events = () => {
             {format(selectedDay, "MMM dd, yyyy")}
           </time>
         </h2>
-        {/* {meetings.map((meeting) => (
-            <Meeting meeting={meeting} key={meeting.id} />
-          ))} */}
+        {selectedDayEvents.length > 0 ? (
+          selectedDayEvents.map((event) => (
+            <Meeting event={event} key={event.id} />
+          ))
+        ) : (
+          // <ol>
+          //   {events.map((event) => {
+          //     let eventDate = parseISO(event.eventDate);
+          //     let startTime = parse(event.startTime, "HH:mm", eventDate);
+          //     let endTime = parse(event.endTime, "HH:mm", eventDate);
+          //     return (
+          //       <div
+          //         key={event.id}
+          //         className="flex justify-between w-full gap-2"
+          //       >
+          //         <p>{event.title}</p>
+          //         {/* <p>{event.description}</p> */}
+          //         <p>{format(startTime, "H:mm a, dd MMM")}</p>
+          //         {/* <p>{format(endTime, "H:mm a, dd MMM")}</p> */}
+          //         {/* <time>{parseISO(event.eventDate)}</time> */}
+          //       </div>
+          //     );
+          //   })}
+          // </ol>
+          <p>No meetings scheduled on selected day</p>
+        )}
+        {/* 
         <ol className="mt-4 space-y-1 text-sm leading-6 text-gray-500">
           {selectedDayMeetings.length > 0 ? (
             selectedDayMeetings.map((meeting) => (
               <Meeting meeting={meeting} key={meeting.id} />
             ))
           ) : (
-            <p>No meetings on selected day</p>
+            <p>No meetings scheduled on selected day</p>
           )}
-        </ol>
+        </ol> */}
       </section>
       {/* Add Event Form */}
       <div className="fixed bottom-0 pb-4 bg-white -right-1 w-96">
         <form
           onSubmit={addEvent}
-          className="relative items-center px-4 mx-auto mt-2"
+          className="relative items-center px-4 mx-auto mt-2 rounded-md"
         >
           <div className="overflow-hidden border border-gray-100 rounded-sm shadow-sm focus-within:border-gray-200 focus-within:ring-1 focus-within:ring-gray-200">
             <label htmlFor="title" className="sr-only">
@@ -227,6 +328,51 @@ const Events = () => {
               placeholder="Event description..."
               // defaultValue={""}
             />
+            <div className="px-2 pb-2">
+              <div className="mt-2 mb-1">
+                <label htmlFor="eventDate" className="text-xs text-gray-400">
+                  Event Date
+                </label>
+                <input
+                  type="date"
+                  id="eventDate"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  required
+                  className="border border-gray-100 rounded-md bg-gray-50"
+                />
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1 w-full mt-2 mb-1">
+                  <label htmlFor="starttime" className="text-xs text-gray-400">
+                    Start Time
+                  </label>
+                  <input
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    type="time"
+                    name="time"
+                    id="starttime"
+                    required
+                    className="border border-gray-100 rounded-md bg-gray-50"
+                  />
+                </div>
+                <div className="flex-1 w-full mt-2 mb-1">
+                  <label htmlFor="endtime" className="text-xs text-gray-400">
+                    End Time
+                  </label>
+                  <input
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    type="time"
+                    name="time"
+                    id="endtime"
+                    required
+                    className="border border-gray-100 rounded-md bg-gray-50"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <button type="submit" className="btn-primary">
@@ -237,87 +383,6 @@ const Events = () => {
     </div>
   );
 };
-
-function Meeting({ meeting }) {
-  let startDatetime = parseISO(meeting.startDatetime);
-  let endDatetime = parseISO(meeting.endDatetime);
-  return (
-    <li
-      key={meeting.id}
-      className="flex items-center px-4 py-2 space-x-4 group rounded-xl focus-within:bg-gray-100 hover:bg-gray-100"
-    >
-      <img
-        src={meeting.imageUrl}
-        alt=""
-        className="flex-none w-10 h-10 rounded-full"
-      />
-      <div className="flex-auto">
-        <p className="text-gray-900">{meeting.name}</p>
-        <p className="mt-0.5">
-          <time dateTime={meeting.startDatetime}>
-            {format(startDatetime, "h:mm a")}
-          </time>{" "}
-          -{" "}
-          <time dateTime={meeting.endDatetime}>
-            {format(endDatetime, "h:mm a")}
-          </time>
-        </p>
-      </div>
-      <Menu
-        as="div"
-        className="relative opacity-0 focus-within:opacity-100 group-hover:opacity-100"
-      >
-        <div>
-          <Menu.Button className="-m-2 flex items-center rounded-full p-1.5 text-gray-500 hover:text-gray-600">
-            <span className="sr-only">Open options</span>
-            <EllipsisVerticalIcon className="w-6 h-6" aria-hidden="true" />
-          </Menu.Button>
-        </div>
-
-        <Transition
-          as={Fragment}
-          enter="transition ease-out duration-100"
-          enterFrom="transform opacity-0 scale-95"
-          enterTo="transform opacity-100 scale-100"
-          leave="transition ease-in duration-75"
-          leaveFrom="transform opacity-100 scale-100"
-          leaveTo="transform opacity-0 scale-95"
-        >
-          <Menu.Items className="absolute right-0 z-10 mt-2 origin-top-right bg-white rounded-md shadow-lg w-36 ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <div className="py-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    href="#"
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
-                    )}
-                  >
-                    Edit
-                  </a>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <a
-                    href="#"
-                    className={classNames(
-                      active ? "bg-gray-100 text-gray-900" : "text-gray-700",
-                      "block px-4 py-2 text-sm"
-                    )}
-                  >
-                    Cancel
-                  </a>
-                )}
-              </Menu.Item>
-            </div>
-          </Menu.Items>
-        </Transition>
-      </Menu>
-    </li>
-  );
-}
 
 // Handle position of first day of month depending on day of week
 let colStartClasses = [
