@@ -49,8 +49,9 @@ export default function LandingPage() {
               <span className="text-emerald-300 animate-pulse">together</span>.
             </h1>
             <p className="leading-6 text-center text-gray-400 sm:leading-8 sm:text-lg ">
-              Supercharge your team's productivity with Bivi. Schedule meetings,
-              assign tasks, and keep track of conversations in real-time.
+              Supercharge your team&apos;s productivity with Bivi. Schedule
+              meetings, assign tasks, and keep track of conversations in
+              real-time.
               {/* Supercharge your team's productivity with Bivi – the all-in-one
               tool for small ambitious teams. Schedule meetings, assign tasks,
               and keep track of conversations in real-time. */}
