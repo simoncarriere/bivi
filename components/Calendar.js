@@ -15,11 +15,14 @@ import {
   parse,
   parseISO,
   add,
+  differenceInMinutes,
 } from "date-fns";
 // Firebase
 import { db } from "../lib/firebase";
 import {
   doc,
+  query,
+  orderBy,
   addDoc,
   collection,
   serverTimestamp,
@@ -53,12 +56,10 @@ export default function Calendar() {
     start: startOfWeek(firstDayCurrentWeek),
     end: endOfWeek(firstDayCurrentWeek),
   });
-
   function previousWeek() {
     let firstDayLastWeek = add(firstDayCurrentWeek, { weeks: -1 });
     setCurrentWeek(format(firstDayLastWeek, "ww"));
   }
-
   function nextWeek() {
     let firstDayNextWeek = add(firstDayCurrentWeek, { weeks: 1 });
     setCurrentWeek(format(firstDayNextWeek, "ww"));
@@ -67,8 +68,9 @@ export default function Calendar() {
   // Grab the Events from the current room
   useEffect(() => {
     let ref = collection(db, "rooms", currentRoom.id, "meetings");
+    let orderedRef = query(ref, orderBy("startTime", "asc"));
 
-    const unsub = onSnapshot(ref, (snapshot) => {
+    const unsub = onSnapshot(orderedRef, (snapshot) => {
       let results = [];
       snapshot.docs.forEach((doc) => {
         let weekday = format(parseISO(doc.data().eventDate), "e");
@@ -90,6 +92,24 @@ export default function Calendar() {
 
     return () => unsub();
   }, [currentRoom]);
+
+  // Grab the Members from the current room
+  // useEffect(() => {
+  //   const ref = collection(db, "rooms", currentRoom.id, "members");
+  //   const unsub = onSnapshot(ref, (snapshot) => {
+  //     let results = [];
+  //     snapshot.docs.forEach((doc) => {
+  //       results.push({
+  //         ...doc.data(),
+  //         id: doc.id,
+  //         value: doc.data().uid,
+  //         label: doc.data().displayName,
+  //       });
+  //     });
+  //     setMembers(results);
+  //   });
+  //   return () => unsub();
+  // }, [currentRoom, user.email]);
 
   // const deleteEvent = async (eventId) => {
   //   let eventRef = doc(db, "rooms", currentRoom.id, "meetings", eventId);
@@ -234,7 +254,7 @@ export default function Calendar() {
             <div className="sticky left-0 z-10 flex-none bg-white w-14 ring-1 ring-gray-100" />
             <div className="grid flex-auto grid-cols-1 grid-rows-1">
               {/* Horizontal lines */}
-              {/* <div
+              <div
                 className="grid col-start-1 col-end-2 row-start-1 divide-y divide-gray-100"
                 style={{ gridTemplateRows: "repeat(48, minmax(3.5rem, 1fr))" }}
               >
@@ -383,13 +403,16 @@ export default function Calendar() {
                   </div>
                 </div>
                 <div />
-              </div> */}
+              </div>
 
               {/* Vertical lines */}
               {/* divide-gray-100 divide-x*/}
-              {/* <p>Test</p> */}
+
               {/* const isToday = isSameDay(day, new Date()); */}
-              <div className="hidden grid-cols-7 col-start-1 col-end-2 grid-rows-6 row-start-1 sm:grid sm:grid-cols-7">
+              <div
+                className="hidden grid-cols-7 col-start-1 col-end-2 row-start-1 sm:grid sm:grid-cols-7"
+                style={{ gridTemplateRows: "repeat(48, minmax(3.5rem, 1fr))" }}
+              >
                 {events
                   .filter((event) =>
                     isSameWeek(parseISO(event.eventDate), firstDayCurrentWeek)
@@ -398,21 +421,42 @@ export default function Calendar() {
                     let eventDate = parseISO(event.eventDate);
                     let startTime = parse(event.startTime, "HH:mm", eventDate);
                     let endTime = parse(event.endTime, "HH:mm", eventDate);
+                    let duration = differenceInMinutes(endTime, startTime) / 30;
+                    // console.log(format(startTime, "H:mm"));
+                    let startHour = format(startTime, "H:mm").split(":")[0];
+                    let startHourNumber = Number(startHour) * 2;
+
+                    console.log(event.title, startHourNumber, duration);
                     return (
                       <div
                         key={event.id}
-                        className={`col-start-${event.weekday} row-start-1 row-span-1 hover:bg-gray-50 border border-gray-200 p-2 rounded-md my-2`}
+                        // style={{ gridRow: `${startHourNumber}` / span ${duration }}
+                        style={{
+                          gridRow: `${startHourNumber} / span ${duration}`,
+                        }}
+                        className={`col-start-${event.weekday}  cursor-pointer bg-emerald-50  hover:bg-emerald-100 border border-emerald-100 p-2 rounded-md `}
                       >
                         <p className="mt-0.5">
-                          <time dateTime={startTime}>
+                          <time
+                            dateTime={startTime}
+                            className="text-xs text-emerald-600 font-xs"
+                          >
                             {format(startTime, "h:mm ")}
                           </time>{" "}
                           -{" "}
-                          <time dateTime={endTime}>
+                          <time
+                            dateTime={endTime}
+                            className="text-xs text-emerald-600"
+                          >
                             {format(endTime, "h:mm a")}
                           </time>
                         </p>
-                        <p className="text-gray-900">{event.title}</p>
+                        <p className="text-base text-emerald-600 ">
+                          {event.title}
+                        </p>
+                        <p className="text-xs text-emerald-600 ">
+                          {duration} minutes
+                        </p>
                       </div>
                     );
                   })}
@@ -488,15 +532,15 @@ export default function Calendar() {
 }
 
 // Handle position of events depending on day of week
-let colStartClasses = [
-  "",
-  "col-start-2",
-  "col-start-3",
-  "col-start-4",
-  "col-start-5",
-  "col-start-6",
-  "col-start-7",
-];
+// let colStartClasses = [
+//   "",
+//   "col-start-2",
+//   "col-start-3",
+//   "col-start-4",
+//   "col-start-5",
+//   "col-start-6",
+//   "col-start-7",
+// ];
 
 {
   /* <div className="hidden md:ml-4 md:flex md:items-center">
