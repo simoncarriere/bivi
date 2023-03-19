@@ -39,12 +39,10 @@ export default function Calendar() {
   const { user, currentRoom } = useAuthContext();
   // Denomalize events locally
   const [events, setEvents] = useState([]);
-  // Hanlde Calendar
+  // Handle Calendar
   const container = useRef(null);
   const containerNav = useRef(null);
   const containerOffset = useRef(null);
-  // Grab Current TIme
-  // var [currentTime, setCurrentTime] = useState(new Date());
 
   // Handle Dates
   let today = startOfToday();
@@ -136,6 +134,8 @@ export default function Calendar() {
   //     1440;
   // }, []);
 
+  // Grab Current TIme
+  // var [currentTime, setCurrentTime] = useState(new Date());
   // useEffect(() => {
   //   var timer = setInterval(() => setCurrentTime(new Date()), 1000);
   //   return function cleanup() {
@@ -250,15 +250,17 @@ export default function Calendar() {
             </div>
           </div>
           {/* Events */}
-          <div className="flex flex-auto">
+          <div className="flex flex-auto pt-2">
             <div className="sticky left-0 z-10 flex-none bg-white w-14 ring-1 ring-gray-100" />
-            <div className="grid flex-auto grid-cols-1 grid-rows-1">
+            <div className="grid flex-auto grid-cols-1 grid-rows-1 ">
               {/* Horizontal lines */}
               <div
                 className="grid col-start-1 col-end-2 row-start-1 divide-y divide-gray-100"
-                style={{ gridTemplateRows: "repeat(48, minmax(3.5rem, 1fr))" }}
+                style={{
+                  gridTemplateRows: "repeat(48, minmax(3.5rem, 3rem))",
+                }}
               >
-                <div ref={containerOffset} className="row-end-1 h-7"></div>
+                {/* <div ref={containerOffset} className="row-end-1 h-7 mb-7"></div> */}
                 <div>
                   <div className="sticky left-0 z-20 -mt-2.5 -ml-14 w-14 pr-2 text-right text-xs leading-5 text-gray-400">
                     12AM
@@ -411,347 +413,93 @@ export default function Calendar() {
               {/* const isToday = isSameDay(day, new Date()); */}
               <div
                 className="hidden grid-cols-7 col-start-1 col-end-2 row-start-1 sm:grid sm:grid-cols-7"
-                style={{ gridTemplateRows: "repeat(48, minmax(3.5rem, 1fr))" }}
+                style={{
+                  gridTemplateRows: "repeat(96, minmax(1.75rem, 0.875rem))",
+                }}
               >
                 {events
                   .filter((event) =>
                     isSameWeek(parseISO(event.eventDate), firstDayCurrentWeek)
                   )
+
                   .map((event) => {
+                    // Check if user is attending event
+                    let isUserAttending = event.eventAttendees.includes(
+                      user.uid
+                    );
+
                     let eventDate = parseISO(event.eventDate);
+                    // Calculate position and duration of event
                     let startTime = parse(event.startTime, "HH:mm", eventDate);
                     let endTime = parse(event.endTime, "HH:mm", eventDate);
-                    let duration = differenceInMinutes(endTime, startTime) / 30;
-                    // console.log(format(startTime, "H:mm"));
+                    let duration = differenceInMinutes(endTime, startTime) / 15;
                     let startHour = format(startTime, "H:mm").split(":")[0];
-                    let startHourNumber = Number(startHour) * 2;
+                    let startMinute = format(startTime, "H:mm").split(":")[1];
+                    let startHourNumber = Number(startHour) * 4 + 1;
+                    let startMinuteNumber = Number(startMinute) / 15;
 
-                    console.log(event.title, startHourNumber, duration);
                     return (
                       <div
                         key={event.id}
-                        // style={{ gridRow: `${startHourNumber}` / span ${duration }}
                         style={{
-                          gridRow: `${startHourNumber} / span ${duration}`,
+                          gridRow: `${
+                            startHourNumber + startMinuteNumber
+                          } / span ${duration}`,
                         }}
-                        className={`col-start-${event.weekday}  cursor-pointer bg-emerald-50  hover:bg-emerald-100 border border-emerald-100 p-2 rounded-md `}
+                        className={`col-start-${
+                          event.weekday
+                        } cursor-pointer  border  px-1 py-0.5 ${
+                          isUserAttending
+                            ? "bg-emerald-50  hover:bg-emerald-100 border-emerald-100 "
+                            : "bg-slate-50  hover:bg-slate-100 border-slate-200 "
+                        } rounded-md `}
                       >
-                        <p className="mt-0.5">
+                        <p>
                           <time
                             dateTime={startTime}
-                            className="text-xs text-emerald-600 font-xs"
+                            className={`text-xs font-extralight ${
+                              isUserAttending
+                                ? "text-emerald-600"
+                                : "text-slate-600"
+                            }}`}
                           >
                             {format(startTime, "h:mm ")}
                           </time>{" "}
                           -{" "}
                           <time
                             dateTime={endTime}
-                            className="text-xs text-emerald-600"
+                            className={`text-xs font-extralight ${
+                              isUserAttending
+                                ? "text-emerald-600"
+                                : "text-slate-600"
+                            }}`}
                           >
                             {format(endTime, "h:mm a")}
                           </time>
                         </p>
-                        <p className="text-base text-emerald-600 ">
+                        <p
+                          className={`text-base  ${
+                            isUserAttending
+                              ? "text-emerald-600"
+                              : "text-slate-600"
+                          }}`}
+                        >
                           {event.title}
                         </p>
-                        <p className="text-xs text-emerald-600 ">
-                          {duration} minutes
-                        </p>
+                        {/* {isUserAttending && <p>YOU MUST ATTEDN</p>} */}
+                        {/* <p className="text-xs text-emerald-600 ">
+                          {duration} Hours
+                        </p> */}
                       </div>
                     );
                   })}
 
                 <div className="w-8 col-start-8 row-span-full" />
               </div>
-
-              {/* Events */}
-              {/* 7 columns */}
-              {/* <ol className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"> */}
-
-              {/* <ol
-                className="grid grid-cols-1 col-start-1 col-end-2 row-start-1 sm:grid-cols-7 sm:pr-8"
-                style={{
-                  gridTemplateRows: "1.75rem repeat(288, minmax(0, 1fr)) auto",
-                }}
-              >
-                <li
-                  className="relative flex mt-px sm:col-start-3"
-                  style={{ gridRow: "74 / span 12" }}
-                >
-                  <a
-                    href="#"
-                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-blue-50 hover:bg-blue-100"
-                  >
-                    <p className="order-1 font-semibold text-blue-700">
-                      Breakfast
-                    </p>
-                    <p className="text-blue-500 group-hover:text-blue-700">
-                      <time dateTime="2022-01-12T06:00">6:00 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li
-                  className="relative flex mt-px sm:col-start-3"
-                  style={{ gridRow: "92 / span 30" }}
-                >
-                  <a
-                    href="#"
-                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 rounded-lg group inset-1 bg-pink-50 hover:bg-pink-100"
-                  >
-                    <p className="order-1 font-semibold text-pink-700">
-                      Flight to Paris
-                    </p>
-                    <p className="text-pink-500 group-hover:text-pink-700">
-                      <time dateTime="2022-01-12T07:30">7:30 AM</time>
-                    </p>
-                  </a>
-                </li>
-                <li
-                  className="relative hidden mt-px sm:col-start-6 sm:flex"
-                  style={{ gridRow: "122 / span 24" }}
-                >
-                  <a
-                    href="#"
-                    className="absolute flex flex-col p-2 overflow-y-auto text-xs leading-5 bg-gray-100 rounded-lg group inset-1 hover:bg-gray-200"
-                  >
-                    <p className="order-1 font-semibold text-gray-700">
-                      Meeting with design team at Disney
-                    </p>
-                    <p className="text-gray-500 group-hover:text-gray-700">
-                      <time dateTime="2022-01-15T10:00">10:00 AM</time>
-                    </p>
-                  </a>
-                </li>
-              </ol> */}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-}
-
-// Handle position of events depending on day of week
-// let colStartClasses = [
-//   "",
-//   "col-start-2",
-//   "col-start-3",
-//   "col-start-4",
-//   "col-start-5",
-//   "col-start-6",
-//   "col-start-7",
-// ];
-
-{
-  /* <div className="hidden md:ml-4 md:flex md:items-center">
-<Menu as="div" className="relative">
-  <Menu.Button
-    type="button"
-    className="flex items-center gap-x-1.5 rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
-  >
-    Week view
-    <ChevronDownIcon
-      className="w-5 h-5 -mr-1 text-gray-400"
-      aria-hidden="true"
-    />
-  </Menu.Button>
-
-  <Transition
-    as={Fragment}
-    enter="transition ease-out duration-100"
-    enterFrom="transform opacity-0 scale-95"
-    enterTo="transform opacity-100 scale-100"
-    leave="transition ease-in duration-75"
-    leaveFrom="transform opacity-100 scale-100"
-    leaveTo="transform opacity-0 scale-95"
-  >
-    <Menu.Items className="absolute right-0 z-10 mt-3 overflow-hidden origin-top-right bg-white rounded-md shadow-lg w-36 ring-1 ring-black ring-opacity-5 focus:outline-none">
-      <div className="py-1">
-        <Menu.Item>
-          {({ active }) => (
-            <a
-              href="#"
-              className={classNames(
-                active
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-700",
-                "block px-4 py-2 text-sm"
-              )}
-            >
-              Day view
-            </a>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <a
-              href="#"
-              className={classNames(
-                active
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-700",
-                "block px-4 py-2 text-sm"
-              )}
-            >
-              Week view
-            </a>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <a
-              href="#"
-              className={classNames(
-                active
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-700",
-                "block px-4 py-2 text-sm"
-              )}
-            >
-              Month view
-            </a>
-          )}
-        </Menu.Item>
-        <Menu.Item>
-          {({ active }) => (
-            <a
-              href="#"
-              className={classNames(
-                active
-                  ? "bg-gray-100 text-gray-900"
-                  : "text-gray-700",
-                "block px-4 py-2 text-sm"
-              )}
-            >
-              Year view
-            </a>
-          )}
-        </Menu.Item>
-      </div>
-    </Menu.Items>
-  </Transition>
-</Menu>
-<div className="w-px h-6 ml-6 bg-gray-300" />
-<button
-  type="button"
-  className="px-3 py-2 ml-6 text-sm font-semibold text-white bg-indigo-600 rounded-md shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
->
-  Add event
-</button>
-</div>
-<Menu as="div" className="relative ml-6 md:hidden">
-<Menu.Button className="flex items-center p-2 -mx-2 text-gray-400 border border-transparent rounded-full hover:text-gray-500">
-  <span className="sr-only">Open menu</span>
-  <EllipsisHorizontalIcon className="w-5 h-5" aria-hidden="true" />
-</Menu.Button>
-
-<Transition
-  as={Fragment}
-  enter="transition ease-out duration-100"
-  enterFrom="transform opacity-0 scale-95"
-  enterTo="transform opacity-100 scale-100"
-  leave="transition ease-in duration-75"
-  leaveFrom="transform opacity-100 scale-100"
-  leaveTo="transform opacity-0 scale-95"
->
-  <Menu.Items className="absolute right-0 z-10 mt-3 overflow-hidden origin-top-right bg-white divide-y divide-gray-100 rounded-md shadow-lg w-36 ring-1 ring-black ring-opacity-5 focus:outline-none">
-    <div className="py-1">
-      <Menu.Item>
-        {({ active }) => (
-          <a
-            href="#"
-            className={classNames(
-              active
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-700",
-              "block px-4 py-2 text-sm"
-            )}
-          >
-            Create event
-          </a>
-        )}
-      </Menu.Item>
-    </div>
-    <div className="py-1">
-      <Menu.Item>
-        {({ active }) => (
-          <a
-            href="#"
-            className={classNames(
-              active
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-700",
-              "block px-4 py-2 text-sm"
-            )}
-          >
-            Go to today
-          </a>
-        )}
-      </Menu.Item>
-    </div>
-    <div className="py-1">
-      <Menu.Item>
-        {({ active }) => (
-          <a
-            href="#"
-            className={classNames(
-              active
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-700",
-              "block px-4 py-2 text-sm"
-            )}
-          >
-            Day view
-          </a>
-        )}
-      </Menu.Item>
-      <Menu.Item>
-        {({ active }) => (
-          <a
-            href="#"
-            className={classNames(
-              active
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-700",
-              "block px-4 py-2 text-sm"
-            )}
-          >
-            Week view
-          </a>
-        )}
-      </Menu.Item>
-      <Menu.Item>
-        {({ active }) => (
-          <a
-            href="#"
-            className={classNames(
-              active
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-700",
-              "block px-4 py-2 text-sm"
-            )}
-          >
-            Month view
-          </a>
-        )}
-      </Menu.Item>
-      <Menu.Item>
-        {({ active }) => (
-          <a
-            href="#"
-            className={classNames(
-              active
-                ? "bg-gray-100 text-gray-900"
-                : "text-gray-700",
-              "block px-4 py-2 text-sm"
-            )}
-          >
-            Year view
-          </a>
-        )}
-      </Menu.Item>
-    </div>
-  </Menu.Items>
-</Transition>
-</Menu> */
 }
