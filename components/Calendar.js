@@ -250,7 +250,7 @@ export default function Calendar() {
             </div>
           </div>
           {/* Events */}
-          <div className="flex flex-auto pt-2">
+          <div className="flex flex-auto ">
             <div className="sticky left-0 z-10 flex-none bg-white w-14 ring-1 ring-gray-100" />
             <div className="grid flex-auto grid-cols-1 grid-rows-1 ">
               {/* Horizontal lines */}
@@ -450,39 +450,42 @@ export default function Calendar() {
                           event.weekday
                         } cursor-pointer  border  px-1 py-0.5 ${
                           isUserAttending
-                            ? "bg-emerald-50  hover:bg-emerald-100 border-emerald-100 "
-                            : "bg-slate-50  hover:bg-slate-100 border-slate-200 "
+                            ? "bg-emerald-100  hover:bg-emerald-200 border-emerald-200 "
+                            : "bg-slate-100  hover:bg-slate-200 border-slate-200 "
                         } rounded-md `}
                       >
                         <p>
                           <time
                             dateTime={startTime}
-                            className={`text-xs font-extralight ${
+                            className={
                               isUserAttending
-                                ? "text-emerald-600"
-                                : "text-slate-600"
-                            }}`}
+                                ? "text-emerald-500 font-extralight text-xs"
+                                : "text-gray-600 font-extralight text-xs"
+                            }
                           >
                             {format(startTime, "h:mm ")}
                           </time>{" "}
                           -{" "}
                           <time
                             dateTime={endTime}
-                            className={`text-xs font-extralight ${
+                            className={
                               isUserAttending
-                                ? "text-emerald-600"
-                                : "text-slate-600"
-                            }}`}
+                                ? "text-emerald-500 font-extralight text-xs"
+                                : "text-gray-600 font-extralight text-xs"
+                            }
+                            // className={`text-xs font-extralight text-gray-600 ${
+                            //   isUserAttending && "text-emerald-600"
+                            // }}`}
                           >
                             {format(endTime, "h:mm a")}
                           </time>
                         </p>
                         <p
-                          className={`text-base  ${
+                          className={
                             isUserAttending
-                              ? "text-emerald-600"
-                              : "text-slate-600"
-                          }}`}
+                              ? "text-emerald-600  text-base"
+                              : "text-gray-500  text-base"
+                          }
                         >
                           {event.title}
                         </p>

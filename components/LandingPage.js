@@ -72,9 +72,10 @@ export default function LandingPage() {
           <Image
             width={1440}
             height={986}
-            src="/Amie.jpeg"
+            src="/bivi-screenshot-light-2.png"
+            // src="/Amie.jpeg"
             alt="hero"
-            className="object-contain rounded-2xl"
+            className="rounded-md "
           />
         </div>
         <Footer />
