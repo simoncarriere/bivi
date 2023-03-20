@@ -4,7 +4,7 @@ import { Dialog, Transition } from "@headlessui/react";
 // Hooks
 import { useSignup } from "../hooks/useSignup";
 
-const SignUp = () => {
+const SignUp = ({ text }) => {
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,9 +22,9 @@ const SignUp = () => {
     <>
       <div
         onClick={() => setShowModal(true)}
-        className="px-6 py-4 text-base font-semibold tracking-wide border rounded-md shadow-sm cursor-pointer text-slate-700 border-slate-200 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        className="px-6 py-3 text-base font-semibold tracking-wide border rounded-md shadow-sm cursor-pointer text-slate-700 border-slate-200 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
       >
-        Skip the waitlist
+        {text}
       </div>
       {showModal && (
         <Transition.Root show={showModal} as={Fragment}>

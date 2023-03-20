@@ -22,7 +22,9 @@ export default function LandingPage() {
             >
               <circle cx={1} cy={1} r={1} />
             </svg>
-            But we&apos;re excited to show you what we&apos;ve built so far.
+            Bivi is an early staged prototype with big dreams and a bold
+            roadmap.
+            {/* But we&apos;re excited to show you what we&apos;ve built so far. */}
             <span aria-hidden="true" className="ml-2">
               &rarr;
             </span>
@@ -31,11 +33,7 @@ export default function LandingPage() {
       </div>
       {/* Header */}
       <div className="mx-2 bg-white sm:mx-0">
-        <header className="flex justify-end p-6 px-10 " aria-label="Global">
-          <Signin />
-        </header>
-
-        <div className="flex flex-col max-w-xl gap-6 mx-auto mt-20 rounded-lg">
+        <header className="flex justify-between p-6 px-10" aria-label="Global">
           <Image
             width={64}
             height={64}
@@ -43,6 +41,13 @@ export default function LandingPage() {
             alt="logo"
             className="object-contain mx-auto transition-all duration-300 rounded-lg hover:scale-110 "
           />
+          <div className="flex items-center gap-4">
+            <Signin />
+            <SignUp text="Sign up" />
+          </div>
+        </header>
+
+        <div className="flex flex-col max-w-xl gap-6 mx-auto mt-20 rounded-lg">
           <div>
             <h1 className="mb-6 text-2xl font-bold text-center text-gray-800 sm:text-7xl">
               Get in done fast, today,{" "}
@@ -65,13 +70,13 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="flex justify-center ">
-            <SignUp />
+            <SignUp text="Skip the Waitlist" />
           </div>
         </div>
-        <div className="max-w-3xl mx-auto mt-16 mb-24 transition-all duration-300 cursor-pointer hover:scale-105">
+        <div className="max-w-5xl mx-auto mt-16 mb-24 transition-all duration-300 border cursor-pointer border-slate-100 hover:scale-105">
           <Image
-            width={1440}
-            height={986}
+            width={1920}
+            height={1280}
             src="/bivi-screenshot.png"
             // src="/Amie.jpeg"
             alt="hero"

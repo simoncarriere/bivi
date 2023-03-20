@@ -10,7 +10,7 @@ export function Footer() {
       </div>
       <nav
         className="flex justify-between gap-6 text-sm "
-        aria-label="quick links"
+        aria-label="social links"
       >
         <a
           href="https://bivi.notion.site/Bivi-Roadmap-7a4f490a54fe4af7b5cc53a5ed2c802f"
@@ -26,7 +26,7 @@ export function Footer() {
         <Link
           href="https://twitter.com/simonsjournal"
           className="group"
-          aria-label="TaxPal on Twitter"
+          aria-label="Twitter"
         >
           <svg
             aria-hidden="true"
@@ -38,7 +38,7 @@ export function Footer() {
         <Link
           href="https://github.com/simoncarriere"
           className="group"
-          aria-label="TaxPal on GitHub"
+          aria-label="GitHub"
         >
           <svg
             aria-hidden="true"

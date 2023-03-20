@@ -119,30 +119,6 @@ export default function Calendar() {
   //   }
   // };
 
-  // console.log(parse(firstDayCurrentWeek));
-
-  // Handle Events
-
-  // Set the container scroll position based on the current time. (TAILWIND UTILITY)
-  // useEffect(() => {
-  //   const currentMinute = new Date().getHours() * 60;
-  //   container.current.scrollTop =
-  //     ((container.current.scrollHeight -
-  //       containerNav.current.offsetHeight -
-  //       containerOffset.current.offsetHeight) *
-  //       currentMinute) /
-  //     1440;
-  // }, []);
-
-  // Grab Current TIme
-  // var [currentTime, setCurrentTime] = useState(new Date());
-  // useEffect(() => {
-  //   var timer = setInterval(() => setCurrentTime(new Date()), 1000);
-  //   return function cleanup() {
-  //     clearInterval(timer);
-  //   };
-  // });
-
   return (
     <div className="flex flex-col h-full ">
       <header className="flex items-center justify-between flex-none px-6 py-4 ">
@@ -450,7 +426,7 @@ export default function Calendar() {
                           event.weekday
                         } cursor-pointer  border  px-1 py-0.5 ${
                           isUserAttending
-                            ? "bg-emerald-100  hover:bg-emerald-200 border-emerald-200 "
+                            ? "bg-indigo-100  hover:bg-indigo-200 border-indigo-200 "
                             : "bg-slate-100  hover:bg-slate-200 border-slate-200 "
                         } rounded-md `}
                       >
@@ -459,7 +435,7 @@ export default function Calendar() {
                             dateTime={startTime}
                             className={
                               isUserAttending
-                                ? "text-emerald-500 font-extralight text-xs"
+                                ? "text-indigo-500 font-extralight text-xs"
                                 : "text-gray-600 font-extralight text-xs"
                             }
                           >
@@ -470,7 +446,7 @@ export default function Calendar() {
                             dateTime={endTime}
                             className={
                               isUserAttending
-                                ? "text-emerald-500 font-extralight text-xs"
+                                ? "text-indigo-500 font-extralight text-xs"
                                 : "text-gray-600 font-extralight text-xs"
                             }
                             // className={`text-xs font-extralight text-gray-600 ${
@@ -483,7 +459,7 @@ export default function Calendar() {
                         <p
                           className={
                             isUserAttending
-                              ? "text-emerald-600  text-base"
+                              ? "text-indigo-600  text-base"
                               : "text-gray-500  text-base"
                           }
                         >
