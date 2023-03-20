@@ -72,7 +72,7 @@ export default function LandingPage() {
           <Image
             width={1440}
             height={986}
-            src="/bivi-screenshot-light-2.png"
+            src="/bivi-screenshot.png"
             // src="/Amie.jpeg"
             alt="hero"
             className="rounded-md "
